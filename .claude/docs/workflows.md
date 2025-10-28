@@ -124,6 +124,7 @@ Doc Keeper
 
 ### 6.1 에이전트 정의
 - **PM Agent**: `.claude/agents/pm.md`
+- **Architect Agent**: `.claude/agents/architect.md`
 - (추가 에이전트는 생성 시 업데이트)
 
 ### 6.2 지원 문서
@@ -131,6 +132,8 @@ Doc Keeper
 - **Git 커밋 컨벤션**: `.claude/docs/git-commit-convention.md`
 - **PM 출력 템플릿**: `.claude/docs/templates/pm-output.md`
 - **PM 체크리스트**: `.claude/docs/check-lists/pm-checklist.md`
+- **Architect 출력 템플릿**: `.claude/docs/templates/architect-output.md`
+- **Architect 체크리스트**: `.claude/docs/check-lists/architect-checklist.md`
 
 ---
 
