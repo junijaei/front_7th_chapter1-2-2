@@ -59,10 +59,16 @@
 - [ ] ⭐ 문서 구조가 템플릿을 따르는가
 - [ ] ✓ 다이어그램이나 표가 적절히 활용되었는가
 
-### 1.8 완료 조건
-- [ ] ⭐ 프로젝트 디렉토리가 생성되어 있는가 (`.claude/outputs/{project-id}-{YYYYMMDD}/`)
-- [ ] ⭐ PRD가 올바른 경로에 저장되어 있는가 (`.claude/outputs/{project-id}-{YYYYMMDD}/prd.md`)
-- [ ] ⭐ 다음 에이전트(Architect, UX Expert)에게 전달 가능한 상태인가
+### 1.8 기술 스택 및 요구사항
+- [ ] ⭐ 기술 스택이 명확히 정의되어 있는가 (React, TypeScript, Tailwind CSS 등)
+- [ ] ⭐ 성능 요구사항이 정의되어 있는가 (로딩 시간, 번들 사이즈 등)
+- [ ] ⭐ 접근성 요구사항이 명시되어 있는가 (WCAG 기준, 키보드 네비게이션 등)
+- [ ] ⭐ 테스트 커버리지 목표가 설정되어 있는가 (70% 이상)
+
+### 1.9 완료 조건
+- [ ] ⭐ 프로젝트 디렉토리가 생성되어 있는가 (`.claude/outputs/{project-id}/`)
+- [ ] ⭐ PRD가 올바른 경로에 저장되어 있는가 (`.claude/outputs/{project-id}/prd.md`)
+- [ ] ⭐ 다음 에이전트(Test Designer)에게 전달 가능한 상태인가
 - [ ] ⭐ 파일 형식이 Markdown (.md)인가
 
 ---
@@ -141,9 +147,16 @@
 
 ### 4.1 프로젝트 시작 시
 - [ ] ⭐ 프로젝트 ID가 생성되었는가 (`{PREFIX}-{NUMBER}-{YYYYMMDD}` 형식)
-- [ ] ⭐ 프로젝트 디렉토리가 생성되었는가 (`.claude/outputs/{project-id}-{YYYYMMDD}/`)
+- [ ] ⭐ 프로젝트 디렉토리가 생성되었는가 (`.claude/outputs/{project-id}/`)
 - [ ] ⭐ PRD가 작성되고 승인되었는가
-- [ ] ⭐ 티켓 번호 범위가 할당되었는가 (PROJ-001부터 시작)
+- [ ] ⭐ 티켓 번호 범위가 할당되었는가
+  - PROJ-001: PM (PRD)
+  - PROJ-002: Test Designer
+  - PROJ-003: Test Writer
+  - PROJ-004: Implementer
+  - PROJ-005: QA
+  - PROJ-006: Refactorer
+  - PROJ-007: Doc Keeper
 - [ ] ⭐ Git 저장소가 준비되었는가
 
 ### 4.2 에이전트 실행 전
