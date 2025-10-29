@@ -103,6 +103,16 @@ UX 설계 문서 작성 후 플로우차트/와이어프레임 포함, 체크리
 
 ---
 
+## 다음 에이전트
+
+UX Expert가 UX Design 문서를 완성한 후, **Product Owner (PO)**에게 전달한다:
+
+**Product Owner (PO)** (`.claude/agents/po.md`)
+- 입력: PRD + Architecture + UX Design
+- 목적: 요구사항 검증 및 Epic/Story 분할
+
+---
+
 ## 참조 문서
 
 - **워크플로우**: `.claude/docs/workflows.md`

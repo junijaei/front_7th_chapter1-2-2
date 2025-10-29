@@ -107,8 +107,15 @@ Architecture 문서 작성 후 다이어그램 포함, 체크리스트 검증, �
 
 ## 다음 에이전트
 
-- **UX Expert와 병렬 실행** (동시에 PRD 기반 작업)
-- **Product Owner**: Architecture + UX Design 완성 후 Epic/Story 분할
+Architect가 Architecture 문서를 완성한 후, **UX Expert와 병렬로 실행**되며, 두 산출물이 모두 완성되면 **Product Owner (PO)**에게 전달한다:
+
+**UX Expert** (`.claude/agents/ux-expert.md`) - 병렬 실행
+- 입력: PRD + Architecture (선택)
+- 목적: 사용자 흐름 및 UX 설계
+
+**Product Owner (PO)** (`.claude/agents/po.md`)
+- 입력: PRD + Architecture + UX Design
+- 목적: 요구사항 검증 및 Epic/Story 분할
 
 ---
 

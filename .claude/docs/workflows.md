@@ -126,6 +126,7 @@ Doc Keeper
 - **PM Agent**: `.claude/agents/pm.md`
 - **Architect Agent**: `.claude/agents/architect.md`
 - **UX Expert Agent**: `.claude/agents/ux-expert.md`
+- **Product Owner (PO) Agent**: `.claude/agents/po.md`
 - (추가 에이전트는 생성 시 업데이트)
 
 ### 6.2 지원 문서
@@ -137,6 +138,8 @@ Doc Keeper
 - **Architect 체크리스트**: `.claude/docs/check-lists/architect-checklist.md`
 - **UX Expert 출력 템플릿**: `.claude/docs/templates/ux-expert-output.md`
 - **UX Expert 체크리스트**: `.claude/docs/check-lists/ux-expert-checklist.md`
+- **PO 출력 템플릿**: `.claude/docs/templates/po-output.md`
+- **PO 체크리스트**: `.claude/docs/check-lists/po-checklist.md`
 
 ---
 
