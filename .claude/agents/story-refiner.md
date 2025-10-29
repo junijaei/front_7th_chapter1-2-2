@@ -165,11 +165,12 @@ Story Refiner는 PO가 작성한 Story를 **개발자가 즉시 개발을 시작
 
 ## 다음 에이전트
 
-Story Refiner가 모든 Story를 상세화한 후, **Scrum Master**에게 전달한다:
+Story Refiner가 각 Story를 상세화한 후, **Developer**가 구현을 시작한다:
 
-**Scrum Master** (`.claude/agents/scrum-master.md` - 향후 생성)
-- 입력: Story 상세 명세 (모든 Story)
-- 목적: Sprint 계획 수립 및 일정 관리
+**Developer** (구현 에이전트)
+- 입력: Story 상세 명세 + Architecture + UX Design
+- 목적: Story 단위로 기능 구현 및 코드 작성
+- 산출물: 구현된 코드, 단위 테스트
 
 ---
 

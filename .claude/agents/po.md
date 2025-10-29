@@ -176,7 +176,7 @@ PO가 Epic/Story 목록을 완성한 후, **Story Refiner**에게 전달한다:
 - 목적: 각 Story의 구체적인 구현 스펙 작성
 - 산출물: Story 상세 명세 문서 (`.claude/outputs/{project-id}-{YYYYMMDD}/stories/{story-id}/story-detail.md`)
 
-Story Refiner가 모든 Story를 상세화한 후, **Scrum Master**에게 전달한다.
+Story Refiner가 각 Story를 상세화한 후, **Developer**가 구현을 시작한다.
 
 ---
 

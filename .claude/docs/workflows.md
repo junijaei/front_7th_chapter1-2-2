@@ -15,10 +15,9 @@
 | 3 | **UX Expert** | 사용자 흐름 및 UX 설계 | PRD, Architecture | UX 설계 문서 |
 | 4 | **Product Owner (PO)** | 요구사항 검증 및 Story 분할 | PRD, UX 문서 | Epic/Story 목록 |
 | 4-1 | **Story Refiner** *(PO 하위)* | Story 구체화 및 스펙 보완 | Epic/Story 목록 | Story 상세 명세 |
-| 5 | **Scrum Master** | 실행 단위 및 스프린트 관리 | Story 목록 | Sprint Plan |
-| 6 | **Developer (Implementer)** | 기능 구현 및 코드 작성 | Architecture, Story | 코드 산출물 |
-| 7 | **QA** | 테스트 설계 및 검증 | 코드, Story | 테스트 리포트 |
-| 8 | **Doc Keeper** | 산출물 인덱싱 및 문서화 | 모든 문서 | 문서 인덱스, 레포트 |
+| 5 | **Developer (Implementer)** | 기능 구현 및 코드 작성 | Architecture, Story | 코드 산출물 |
+| 6 | **QA** | 테스트 설계 및 검증 | 코드, Story | 테스트 리포트 |
+| 7 | **Doc Keeper** | 산출물 인덱싱 및 문서화 | 모든 문서 | 문서 인덱스, 레포트 |
 
 ---
 
@@ -33,21 +32,17 @@
    - PRD를 기반으로 기술 구조와 사용자 흐름을 동시에 설계.  
    - 두 결과물은 PO 단계의 Story 정의에 공동으로 참조됨.
 
-3. **PO & Story Refiner**  
-   - 설계 결과를 검증 후 Epic/Story로 분할.  
+3. **PO & Story Refiner**
+   - 설계 결과를 검증 후 Epic/Story로 분할.
    - Story Refiner가 구체적인 실행 단위로 세분화.
 
-4. **Scrum Master**  
-   - Story 기반으로 Sprint Plan 수립 및 일정 관리.  
-   - Developer와 QA의 실행 순서를 제어.
-
-5. **Developer & QA (반복 사이클)**  
-   - Developer는 Story 단위로 코드 작성.  
-   - QA는 각 Story 완료 후 테스트 및 검증을 수행.  
+4. **Developer & QA (반복 사이클)**
+   - Developer는 Story 단위로 코드 작성.
+   - QA는 각 Story 완료 후 테스트 및 검증을 수행.
    - 검증 실패 시 Developer 단계로 회귀.
 
-6. **Doc Keeper**  
-   - 모든 산출물을 인덱싱 및 아카이빙.  
+5. **Doc Keeper**
+   - 모든 산출물을 인덱싱 및 아카이빙.
    - 문서 갱신 및 종합 리포트 생성.
 
 ---
@@ -59,8 +54,6 @@
 PRD → (Architect + UX Expert)
 ↓
 (Product Owner → Story Refiner)
-↓
-Scrum Master
 ↓
 (Developer ↔ QA)
 ↓
@@ -97,7 +90,6 @@ Doc Keeper
     ├── architecture.md              # Architect 산출물 (티켓: PROJ-002)
     ├── ux-design.md                 # UX Expert 산출물 (티켓: PROJ-003)
     ├── epics-stories.md             # PO 산출물 (티켓: PROJ-004)
-    ├── sprint-plan.md               # Scrum Master 산출물 (티켓: PROJ-006)
     ├── stories/                     # Story별 산출물
     │   ├── PROJ-007/                # Story 티켓 번호
     │   │   ├── story-detail.md      # Story Refiner 산출물
