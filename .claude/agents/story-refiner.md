@@ -165,12 +165,14 @@ Story Refiner는 PO가 작성한 Story를 **개발자가 즉시 개발을 시작
 
 ## 다음 에이전트
 
-Story Refiner가 각 Story를 상세화한 후, **Developer**가 구현을 시작한다:
+Story Refiner가 각 Story를 상세화한 후, **Test Designer**가 테스트 시나리오를 설계한다:
 
-**Developer** (구현 에이전트)
+**Test Designer** (`.claude/agents/test-designer.md` - 향후 생성)
 - 입력: Story 상세 명세 + Architecture + UX Design
-- 목적: Story 단위로 기능 구현 및 코드 작성
-- 산출물: 구현된 코드, 단위 테스트
+- 목적: TDD 기반 테스트 시나리오 설계
+- 산출물: 테스트 시나리오 문서 (`.claude/outputs/{project-id}/stories/{story-id}/test-scenarios.md`)
+
+**TDD 워크플로우**: Test Designer → Test Writer → Implementer → QA
 
 ---
 
