@@ -171,9 +171,10 @@ Product Owner는 PRD, Architecture, UX Design을 기반으로 **개발 가능한
 
 PO가 Epic/Story 목록을 완성한 후, **Story Refiner**에게 전달한다:
 
-**Story Refiner** (`.claude/agents/story-refiner.md` - 향후 생성)
-- 입력: Epic/Story 목록
+**Story Refiner** (`.claude/agents/story-refiner.md`)
+- 입력: Epic/Story 목록 + Architecture + UX Design
 - 목적: 각 Story의 구체적인 구현 스펙 작성
+- 산출물: Story 상세 명세 문서 (`.claude/outputs/{project-id}-{YYYYMMDD}/stories/{story-id}/story-detail.md`)
 
 Story Refiner가 모든 Story를 상세화한 후, **Scrum Master**에게 전달한다.
 
