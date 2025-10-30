@@ -1,4 +1,12 @@
-import { Notifications, ChevronLeft, ChevronRight, Delete, Edit, Close } from '@mui/icons-material';
+import {
+  Notifications,
+  ChevronLeft,
+  ChevronRight,
+  Delete,
+  Edit,
+  Close,
+  Repeat,
+} from '@mui/icons-material';
 import {
   Alert,
   AlertTitle,
@@ -35,8 +43,7 @@ import { useEventForm } from './hooks/useEventForm.ts';
 import { useEventOperations } from './hooks/useEventOperations.ts';
 import { useNotifications } from './hooks/useNotifications.ts';
 import { useSearch } from './hooks/useSearch.ts';
-// import { Event, EventForm, RepeatType } from './types';
-import { Event, EventForm } from './types';
+import { Event, EventForm, RepeatType } from './types';
 import {
   formatDate,
   formatMonth,
@@ -77,11 +84,11 @@ function App() {
     isRepeating,
     setIsRepeating,
     repeatType,
-    // setRepeatType,
+    setRepeatType,
     repeatInterval,
-    // setRepeatInterval,
+    setRepeatInterval,
     repeatEndDate,
-    // setRepeatEndDate,
+    setRepeatEndDate,
     notificationTime,
     setNotificationTime,
     startTimeError,
@@ -421,6 +428,38 @@ function App() {
             />
           </FormControl>
 
+          {isRepeating && (
+            <>
+              <FormControl fullWidth>
+                <FormLabel htmlFor="repeat-type">반복</FormLabel>
+                <Select
+                  id="repeat-type"
+                  size="small"
+                  value={repeatType}
+                  onChange={(e) => setRepeatType(e.target.value as RepeatType)}
+                  aria-label="반복"
+                >
+                  <MenuItem value="daily">매일</MenuItem>
+                  <MenuItem value="weekly">매주</MenuItem>
+                  <MenuItem value="monthly">매월</MenuItem>
+                  <MenuItem value="yearly">매년</MenuItem>
+                </Select>
+              </FormControl>
+
+              <FormControl fullWidth>
+                <FormLabel htmlFor="repeat-end-date">종료 날짜</FormLabel>
+                <TextField
+                  id="repeat-end-date"
+                  size="small"
+                  type="date"
+                  value={repeatEndDate}
+                  onChange={(e) => setRepeatEndDate(e.target.value)}
+                  aria-label="종료 날짜"
+                />
+              </FormControl>
+            </>
+          )}
+
           <FormControl fullWidth>
             <FormLabel htmlFor="notification">알림 설정</FormLabel>
             <Select
@@ -438,45 +477,6 @@ function App() {
           </FormControl>
 
           {/* ! 반복은 8주차 과제에 포함됩니다. 구현하고 싶어도 참아주세요~ */}
-          {/* {isRepeating && (
-            <Stack spacing={2}>
-              <FormControl fullWidth>
-                <FormLabel>반복 유형</FormLabel>
-                <Select
-                  size="small"
-                  value={repeatType}
-                  onChange={(e) => setRepeatType(e.target.value as RepeatType)}
-                >
-                  <MenuItem value="daily">매일</MenuItem>
-                  <MenuItem value="weekly">매주</MenuItem>
-                  <MenuItem value="monthly">매월</MenuItem>
-                  <MenuItem value="yearly">매년</MenuItem>
-                </Select>
-              </FormControl>
-              <Stack direction="row" spacing={2}>
-                <FormControl fullWidth>
-                  <FormLabel>반복 간격</FormLabel>
-                  <TextField
-                    size="small"
-                    type="number"
-                    value={repeatInterval}
-                    onChange={(e) => setRepeatInterval(Number(e.target.value))}
-                    slotProps={{ htmlInput: { min: 1 } }}
-                  />
-                </FormControl>
-                <FormControl fullWidth>
-                  <FormLabel>반복 종료일</FormLabel>
-                  <TextField
-                    size="small"
-                    type="date"
-                    value={repeatEndDate}
-                    onChange={(e) => setRepeatEndDate(e.target.value)}
-                  />
-                </FormControl>
-              </Stack>
-            </Stack>
-          )} */}
-
           <Button
             data-testid="event-submit-button"
             onClick={addOrUpdateEvent}
@@ -536,11 +536,19 @@ function App() {
             <Typography>검색 결과가 없습니다.</Typography>
           ) : (
             filteredEvents.map((event) => (
-              <Box key={event.id} sx={{ border: 1, borderRadius: 2, p: 3, width: '100%' }}>
+              <Box
+                key={event.id}
+                role="listitem"
+                aria-label={event.title}
+                sx={{ border: 1, borderRadius: 2, p: 3, width: '100%' }}
+              >
                 <Stack direction="row" justifyContent="space-between">
                   <Stack>
                     <Stack direction="row" spacing={1} alignItems="center">
                       {notifiedEvents.includes(event.id) && <Notifications color="error" />}
+                      {event.repeat.type !== 'none' && (
+                        <Repeat aria-label="반복 일정" fontSize="small" color="action" />
+                      )}
                       <Typography
                         fontWeight={notifiedEvents.includes(event.id) ? 'bold' : 'normal'}
                         color={notifiedEvents.includes(event.id) ? 'error' : 'inherit'}

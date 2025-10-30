@@ -70,11 +70,13 @@ describe('RecurrenceEditModal', () => {
     const yesButton = screen.getByRole('button', { name: '예' });
     const noButton = screen.getByRole('button', { name: '아니오' });
 
-    // 첫 번째 Tab: "예" 버튼에 포커스
-    await user.tab();
-    expect(yesButton).toHaveFocus();
+    // 모달이 열리면 autoFocus로 인해 "예" 버튼에 자동 포커스
+    // 기다려서 확인
+    await vi.waitFor(() => {
+      expect(yesButton).toHaveFocus();
+    });
 
-    // 두 번째 Tab: "아니오" 버튼에 포커스
+    // 첫 번째 Tab: "아니오" 버튼으로 포커스 이동
     await user.tab();
     expect(noButton).toHaveFocus();
   });

@@ -2,6 +2,7 @@ import { useSnackbar } from 'notistack';
 import { useEffect, useState } from 'react';
 
 import { Event, EventForm } from '../types';
+import { generateRecurringEvents } from '../utils/recurringEventUtils';
 
 export const useEventOperations = (editing: boolean, onSave?: () => void) => {
   const [events, setEvents] = useState<Event[]>([]);
@@ -23,23 +24,58 @@ export const useEventOperations = (editing: boolean, onSave?: () => void) => {
 
   const saveEvent = async (eventData: Event | EventForm) => {
     try {
-      let response;
-      if (editing) {
-        response = await fetch(`/api/events/${(eventData as Event).id}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(eventData),
-        });
-      } else {
-        response = await fetch('/api/events', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(eventData),
-        });
-      }
+      // If it's a recurring event, generate all instances
+      if (eventData.repeat.type !== 'none' && eventData.repeat.endDate) {
+        const startDate = new Date(eventData.date);
+        const endDate = new Date(eventData.repeat.endDate);
 
-      if (!response.ok) {
-        throw new Error('Failed to save event');
+        const recurringEvents = generateRecurringEvents(
+          startDate,
+          endDate,
+          eventData.repeat.type,
+          {
+            title: eventData.title,
+            startTime: eventData.startTime,
+            endTime: eventData.endTime,
+            description: eventData.description,
+            location: eventData.location,
+            category: eventData.category,
+            notificationTime: eventData.notificationTime,
+          }
+        );
+
+        // Save all recurring event instances
+        for (const event of recurringEvents) {
+          const response = await fetch('/api/events', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(event),
+          });
+
+          if (!response.ok) {
+            throw new Error('Failed to save recurring event instance');
+          }
+        }
+      } else {
+        // Single event
+        let response;
+        if (editing) {
+          response = await fetch(`/api/events/${(eventData as Event).id}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(eventData),
+          });
+        } else {
+          response = await fetch('/api/events', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(eventData),
+          });
+        }
+
+        if (!response.ok) {
+          throw new Error('Failed to save event');
+        }
       }
 
       await fetchEvents();

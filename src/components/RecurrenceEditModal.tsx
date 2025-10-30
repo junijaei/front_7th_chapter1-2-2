@@ -18,15 +18,6 @@ export function RecurrenceEditModal({ isOpen, onConfirm, onCancel }: RecurrenceE
   const yesButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
-    if (isOpen) {
-      // 모달이 열릴 때 첫 번째 버튼에 포커스
-      setTimeout(() => {
-        yesButtonRef.current?.focus();
-      }, 100);
-    }
-  }, [isOpen]);
-
-  useEffect(() => {
     const handleEscape = (event: KeyboardEvent) => {
       if (event.key === 'Escape' && isOpen) {
         onCancel();
@@ -62,6 +53,7 @@ export function RecurrenceEditModal({ isOpen, onConfirm, onCancel }: RecurrenceE
           onClick={() => onConfirm('single')}
           variant="contained"
           color="primary"
+          autoFocus
         >
           예
         </Button>
