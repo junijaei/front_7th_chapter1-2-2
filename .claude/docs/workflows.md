@@ -31,6 +31,7 @@
      - 각 단계의 산출물 검증 및 다음 단계 실행 여부 판단
      - 테스트 실패 시 적절한 단계로 회귀 (TDD Red-Green-Refactor 보장)
      - 모든 테스트 통과 확인 및 최종 완료 판정
+     - **사용자 승인 없이 자율적으로 완료까지 실행** (진행/중단 결정권)
    - **종료 조건**: 모든 테스트가 통과하고 QA 검증이 완료될 때까지 반복
    - **산출물**: 완성된 기능 (테스트 + 구현 코드 + 문서)
 
@@ -186,6 +187,8 @@ Orchestrator 조율    │                             │
 - **제약 명시**: 에이전트의 한계나 권한을 명확히 기술한다.
 - **Git 커밋 관리**: 오케스트레이터는 각 에이전트의 산출물을 체크리스트 검증 후 즉시 커밋한다.
 - **품질 검증**: 모든 산출물은 해당 에이전트의 체크리스트를 통과해야 한다.
+- **Orchestrator 자율성**: Orchestrator는 완료 전까지 사용자 승인을 요청하지 않고 자율적으로 진행한다.
+- **실행 이력 기록**: Doc Keeper는 전체 실행 과정(성공/실패/회귀)을 `execution-history.md`에 기록한다.
 
 ---
 
@@ -258,6 +261,7 @@ Orchestrator 조율    │                             │
     ├── test-scenarios.md            # Test Designer 산출물 (티켓: PROJ-002)
     ├── qa-report.md                 # QA 산출물 (티켓: PROJ-005)
     ├── refactoring-report.md        # Refactorer 산출물 (티켓: PROJ-006)
+    ├── execution-history.md         # Doc Keeper 산출물 - 실행 이력 (티켓: PROJ-007)
     ├── index.md                     # Doc Keeper 산출물 (티켓: PROJ-007)
     └── final-report.md              # Doc Keeper 산출물 (티켓: PROJ-007)
 ```
