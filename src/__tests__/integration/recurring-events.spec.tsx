@@ -1,219 +1,516 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import CssBaseline from '@mui/material/CssBaseline';
+import { ThemeProvider, createTheme } from '@mui/material/styles';
 import { render, screen, within } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
+import { userEvent } from '@testing-library/user-event';
+import { http, HttpResponse } from 'msw';
 import { SnackbarProvider } from 'notistack';
+import { ReactElement } from 'react';
+
 import App from '../../App';
+import { server } from '../../setupTests';
+import { Event } from '../../types';
 
-describe('반복 일정 통합 테스트', () => {
-  beforeEach(() => {
-    vi.useRealTimers(); // Ensure clean state first
-    vi.useFakeTimers();
-    vi.setSystemTime(new Date('2025-01-01'));
-  });
+const theme = createTheme();
 
+const setup = (element: ReactElement) => {
+  const user = userEvent.setup();
+
+  return {
+    ...render(
+      <ThemeProvider theme={theme}>
+        <CssBaseline />
+        <SnackbarProvider>{element}</SnackbarProvider>
+      </ThemeProvider>
+    ),
+    user,
+  };
+};
+
+describe('반복 일정 수정 및 삭제', () => {
   afterEach(() => {
-    vi.useRealTimers();
+    server.resetHandlers();
   });
 
-  describe('반복 일정 생성 플로우', () => {
-    it.skip('사용자가 매주 반복 일정을 생성할 수 있다', async () => {
-      const user = userEvent.setup({ delay: null });
-      render(
-        <SnackbarProvider>
-          <App />
-        </SnackbarProvider>
-      );
-
-      // Wait for initial load
-      await screen.findByRole('button', { name: /일정 추가/ });
-
-      // 1. 제목 입력
-      const titleInput = screen.getByLabelText(/제목/);
-      await user.clear(titleInput);
-      await user.type(titleInput, '주간 회의');
-
-      // 2. 날짜 입력
-      const dateInput = screen.getByLabelText(/날짜/);
-      await user.clear(dateInput);
-      await user.type(dateInput, '2025-01-06');
-
-      // 3. 시작/종료 시간 입력
-      const startTimeInput = screen.getByLabelText(/시작 시간/);
-      await user.clear(startTimeInput);
-      await user.type(startTimeInput, '10:00');
-
-      const endTimeInput = screen.getByLabelText(/종료 시간/);
-      await user.clear(endTimeInput);
-      await user.type(endTimeInput, '11:00');
-
-      // 4. 반복 일정 체크박스 선택
-      const repeatCheckbox = screen.getByRole('checkbox', { name: /반복 일정/ });
-      await user.click(repeatCheckbox);
-
-      // 5. 반복 유형 "매주" 선택
-      const repeatSelect = screen.getByLabelText(/반복/);
-      await user.click(repeatSelect);
-      const weeklyOption = screen.getByRole('option', { name: /매주/ });
-      await user.click(weeklyOption);
-
-      // 6. 종료 날짜 선택
-      const endDateInput = screen.getByLabelText(/종료 날짜/);
-      await user.clear(endDateInput);
-      await user.type(endDateInput, '2025-01-27');
-
-      // 7. 저장 버튼 클릭
-      const saveButton = screen.getByRole('button', { name: /일정 추가/ });
-      await user.click(saveButton);
-
-      // 8. 캘린더에 4개의 반복 일정이 표시되는지 확인 (1/6, 1/13, 1/20, 1/27)
-      await vi.waitFor(
-        () => {
-          const eventItems = screen.getAllByRole('listitem', { name: /주간 회의/ });
-          expect(eventItems).toHaveLength(4);
+  it('반복 일정 중 하나를 단일 수정하면 해당 일정만 변경되고 반복 아이콘이 제거된다', async () => {
+    // Given: 4개의 반복 일정 설정
+    const mockEvents: Event[] = [
+      {
+        id: '1',
+        title: '주간 회의',
+        date: '2025-10-06',
+        startTime: '10:00',
+        endTime: '11:00',
+        description: '주간 팀 미팅',
+        location: '회의실 A',
+        category: '업무',
+        repeat: {
+          type: 'weekly',
+          interval: 1,
+          endDate: '2025-10-27',
+          recurrenceId: 'rec-1',
         },
-        { timeout: 3000 }
-      );
+        notificationTime: 10,
+      },
+      {
+        id: '2',
+        title: '주간 회의',
+        date: '2025-10-13',
+        startTime: '10:00',
+        endTime: '11:00',
+        description: '주간 팀 미팅',
+        location: '회의실 A',
+        category: '업무',
+        repeat: {
+          type: 'weekly',
+          interval: 1,
+          endDate: '2025-10-27',
+          recurrenceId: 'rec-1',
+        },
+        notificationTime: 10,
+      },
+      {
+        id: '3',
+        title: '주간 회의',
+        date: '2025-10-20',
+        startTime: '10:00',
+        endTime: '11:00',
+        description: '주간 팀 미팅',
+        location: '회의실 A',
+        category: '업무',
+        repeat: {
+          type: 'weekly',
+          interval: 1,
+          endDate: '2025-10-27',
+          recurrenceId: 'rec-1',
+        },
+        notificationTime: 10,
+      },
+      {
+        id: '4',
+        title: '주간 회의',
+        date: '2025-10-27',
+        startTime: '10:00',
+        endTime: '11:00',
+        description: '주간 팀 미팅',
+        location: '회의실 A',
+        category: '업무',
+        repeat: {
+          type: 'weekly',
+          interval: 1,
+          endDate: '2025-10-27',
+          recurrenceId: 'rec-1',
+        },
+        notificationTime: 10,
+      },
+    ];
 
-      // 9. 각 일정에 반복 아이콘이 표시되는지 확인
-      const eventItems = screen.getAllByRole('listitem', { name: /주간 회의/ });
-      eventItems.forEach((item) => {
-        const recurrenceIcon = within(item).getByLabelText(/반복 일정/);
-        expect(recurrenceIcon).toBeInTheDocument();
-      });
-    });
+    server.use(
+      http.get('/api/events', () => {
+        return HttpResponse.json({ events: mockEvents });
+      }),
+      http.put('/api/events/:id', async ({ params, request }) => {
+        const { id } = params;
+        const updatedEvent = (await request.json()) as Event;
+        const index = mockEvents.findIndex((e) => e.id === id);
+
+        if (index !== -1) {
+          // 단일 수정: repeat.type을 'none'으로 변경
+          mockEvents[index] = {
+            ...mockEvents[index],
+            ...updatedEvent,
+            repeat: { type: 'none', interval: 0 },
+          };
+        }
+
+        return HttpResponse.json(mockEvents[index]);
+      })
+    );
+
+    const { user } = setup(<App />);
+
+    // When: 두 번째 일정 편집
+    const editButtons = await screen.findAllByLabelText('Edit event');
+    await user.click(editButtons[1]);
+
+    // 제목 변경
+    const titleInput = screen.getByLabelText('제목');
+    await user.clear(titleInput);
+    await user.type(titleInput, '긴급 회의');
+
+    await user.click(screen.getByTestId('event-submit-button'));
+
+    // 모달에서 "예" (단일 수정) 클릭
+    const modal = await screen.findByRole('dialog');
+    expect(within(modal).getByText('반복 일정 수정')).toBeInTheDocument();
+    expect(within(modal).getByText('해당 일정만 수정하시겠어요?')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: '예' }));
+
+    // Then: 검증
+    const eventList = within(screen.getByTestId('event-list'));
+    expect(eventList.getByText('긴급 회의')).toBeInTheDocument();
+
+    const weeklyMeetings = eventList.getAllByText('주간 회의');
+    expect(weeklyMeetings).toHaveLength(3);
+
+    // 수정된 일정에는 반복 아이콘이 없어야 함
+    const urgentMeetingItem = eventList.getByText('긴급 회의').closest('[role="listitem"]');
+    expect(within(urgentMeetingItem!).queryByLabelText('반복 일정')).not.toBeInTheDocument();
+
+    // 다른 3개 일정은 반복 아이콘 유지
+    const repeatIcons = eventList.getAllByLabelText('반복 일정');
+    expect(repeatIcons).toHaveLength(3);
   });
 
-  describe('반복 일정 수정 플로우', () => {
-    it.skip('사용자가 반복 일정 중 하나를 단일 수정할 수 있다', async () => {
-      const user = userEvent.setup();
-      render(
-        <SnackbarProvider>
-          <App />
-        </SnackbarProvider>
-      );
+  it('반복 일정 전체를 수정하면 모든 일정이 변경되고 반복 아이콘이 유지된다', async () => {
+    // Given: 4개의 반복 일정 설정
+    const mockEvents: Event[] = [
+      {
+        id: '1',
+        title: '주간 회의',
+        date: '2025-10-06',
+        startTime: '10:00',
+        endTime: '11:00',
+        description: '주간 팀 미팅',
+        location: '회의실 A',
+        category: '업무',
+        repeat: {
+          type: 'weekly',
+          interval: 1,
+          endDate: '2025-10-27',
+          recurrenceId: 'rec-1',
+        },
+        notificationTime: 10,
+      },
+      {
+        id: '2',
+        title: '주간 회의',
+        date: '2025-10-13',
+        startTime: '10:00',
+        endTime: '11:00',
+        description: '주간 팀 미팅',
+        location: '회의실 A',
+        category: '업무',
+        repeat: {
+          type: 'weekly',
+          interval: 1,
+          endDate: '2025-10-27',
+          recurrenceId: 'rec-1',
+        },
+        notificationTime: 10,
+      },
+      {
+        id: '3',
+        title: '주간 회의',
+        date: '2025-10-20',
+        startTime: '10:00',
+        endTime: '11:00',
+        description: '주간 팀 미팅',
+        location: '회의실 A',
+        category: '업무',
+        repeat: {
+          type: 'weekly',
+          interval: 1,
+          endDate: '2025-10-27',
+          recurrenceId: 'rec-1',
+        },
+        notificationTime: 10,
+      },
+      {
+        id: '4',
+        title: '주간 회의',
+        date: '2025-10-27',
+        startTime: '10:00',
+        endTime: '11:00',
+        description: '주간 팀 미팅',
+        location: '회의실 A',
+        category: '업무',
+        repeat: {
+          type: 'weekly',
+          interval: 1,
+          endDate: '2025-10-27',
+          recurrenceId: 'rec-1',
+        },
+        notificationTime: 10,
+      },
+    ];
 
-      // 1. 매주 반복 일정 생성 (생략 - 위 테스트와 동일)
-      // ...
+    server.use(
+      http.get('/api/events', () => {
+        return HttpResponse.json({ events: mockEvents });
+      }),
+      http.put('/api/events/:id', async ({ params, request }) => {
+        const { id } = params;
+        const updatedEvent = (await request.json()) as Event;
+        const targetEvent = mockEvents.find((e) => e.id === id);
 
-      // 2. 두 번째 일정 (1/13) 클릭
-      const eventItems = screen.getAllByRole('listitem', { name: /주간 회의/ });
-      await user.click(eventItems[1]);
+        if (targetEvent?.repeat.recurrenceId) {
+          // 전체 수정: 동일한 recurrenceId를 가진 모든 일정 수정
+          const recurrenceId = targetEvent.repeat.recurrenceId;
+          mockEvents.forEach((event) => {
+            if (event.repeat.recurrenceId === recurrenceId) {
+              Object.assign(event, updatedEvent);
+            }
+          });
+        }
 
-      // 3. 제목 변경
-      const titleInput = screen.getByLabelText(/제목/);
-      await user.clear(titleInput);
-      await user.type(titleInput, '긴급 회의');
+        return HttpResponse.json(targetEvent);
+      })
+    );
 
-      // 4. 저장 버튼 클릭
-      const saveButton = screen.getByRole('button', { name: /저장/ });
-      await user.click(saveButton);
+    const { user } = setup(<App />);
 
-      // 5. 모달에서 "예" 클릭 (단일 수정)
-      const modal = screen.getByRole('dialog');
-      const yesButton = within(modal).getByRole('button', { name: '예' });
-      await user.click(yesButton);
+    // When: 두 번째 일정 편집
+    const editButtons = await screen.findAllByLabelText('Edit event');
+    await user.click(editButtons[1]);
 
-      // 6. 해당 일정만 제목이 변경되고, 반복 아이콘이 제거되었는지 확인
-      expect(screen.getByText('긴급 회의')).toBeInTheDocument();
-      expect(screen.queryByLabelText(/반복 일정/, { selector: '[data-event-id="event-2"]' })).not.toBeInTheDocument();
+    // 제목 변경
+    const titleInput = screen.getByLabelText('제목');
+    await user.clear(titleInput);
+    await user.type(titleInput, '전체 회의 변경');
 
-      // 7. 다른 일정은 변경되지 않았는지 확인
-      expect(
-        screen.queryByLabelText(/반복 일정/, { selector: '[data-event-id="event-2"]' })
-      ).not.toBeInTheDocument();
-      const remainingEvents = screen.getAllByText('주간 회의');
-      expect(remainingEvents).toHaveLength(3);
-    });
+    await user.click(screen.getByTestId('event-submit-button'));
 
-    it.skip('사용자가 반복 일정 전체를 수정할 수 있다', async () => {
-      const user = userEvent.setup();
-      render(
-        <SnackbarProvider>
-          <App />
-        </SnackbarProvider>
-      );
+    // 모달에서 "아니오" (전체 수정) 클릭
+    const modal = await screen.findByRole('dialog');
+    expect(within(modal).getByText('반복 일정 수정')).toBeInTheDocument();
 
-      // 1. 매주 반복 일정 생성 (생략)
-      // ...
+    await user.click(screen.getByRole('button', { name: '아니오' }));
 
-      // 2. 임의의 일정 클릭
-      const eventItems = screen.getAllByRole('listitem', { name: /주간 회의/ });
-      await user.click(eventItems[1]);
+    // Then: 검증
+    const eventList = within(screen.getByTestId('event-list'));
+    const allEvents = eventList.getAllByText('전체 회의 변경');
+    expect(allEvents).toHaveLength(4);
 
-      // 3. 제목 변경
-      const titleInput = screen.getByLabelText(/제목/);
-      await user.clear(titleInput);
-      await user.type(titleInput, '전체 회의');
+    expect(eventList.queryByText('주간 회의')).not.toBeInTheDocument();
 
-      // 4. 저장 버튼 클릭
-      const saveButton = screen.getByRole('button', { name: /저장/ });
-      await user.click(saveButton);
-
-      // 5. 모달에서 "아니오" 클릭 (전체 수정)
-      const modal = screen.getByRole('dialog');
-      const noButton = within(modal).getByRole('button', { name: '아니오' });
-      await user.click(noButton);
-
-      // 6. 모든 일정의 제목이 변경되었는지 확인
-      const allEvents = screen.getAllByText('전체 회의');
-      expect(allEvents).toHaveLength(4);
-
-      // 7. 모든 일정의 반복 아이콘이 유지되는지 확인
-      const recurrenceIcons = screen.getAllByLabelText(/반복 일정/);
-      expect(recurrenceIcons).toHaveLength(4);
-    });
+    // 모든 일정이 반복 아이콘 유지
+    const repeatIcons = eventList.getAllByLabelText('반복 일정');
+    expect(repeatIcons).toHaveLength(4);
   });
 
-  describe('반복 일정 삭제 플로우', () => {
-    it.skip('사용자가 반복 일정 중 하나를 단일 삭제할 수 있다', async () => {
-      const user = userEvent.setup();
-      render(
-        <SnackbarProvider>
-          <App />
-        </SnackbarProvider>
-      );
+  it('반복 일정 중 하나를 단일 삭제하면 해당 일정만 삭제된다', async () => {
+    // Given: 4개의 반복 일정 설정
+    const mockEvents: Event[] = [
+      {
+        id: '1',
+        title: '주간 회의',
+        date: '2025-10-06',
+        startTime: '10:00',
+        endTime: '11:00',
+        description: '주간 팀 미팅',
+        location: '회의실 A',
+        category: '업무',
+        repeat: {
+          type: 'weekly',
+          interval: 1,
+          endDate: '2025-10-27',
+          recurrenceId: 'rec-1',
+        },
+        notificationTime: 10,
+      },
+      {
+        id: '2',
+        title: '주간 회의',
+        date: '2025-10-13',
+        startTime: '10:00',
+        endTime: '11:00',
+        description: '주간 팀 미팅',
+        location: '회의실 A',
+        category: '업무',
+        repeat: {
+          type: 'weekly',
+          interval: 1,
+          endDate: '2025-10-27',
+          recurrenceId: 'rec-1',
+        },
+        notificationTime: 10,
+      },
+      {
+        id: '3',
+        title: '주간 회의',
+        date: '2025-10-20',
+        startTime: '10:00',
+        endTime: '11:00',
+        description: '주간 팀 미팅',
+        location: '회의실 A',
+        category: '업무',
+        repeat: {
+          type: 'weekly',
+          interval: 1,
+          endDate: '2025-10-27',
+          recurrenceId: 'rec-1',
+        },
+        notificationTime: 10,
+      },
+      {
+        id: '4',
+        title: '주간 회의',
+        date: '2025-10-27',
+        startTime: '10:00',
+        endTime: '11:00',
+        description: '주간 팀 미팅',
+        location: '회의실 A',
+        category: '업무',
+        repeat: {
+          type: 'weekly',
+          interval: 1,
+          endDate: '2025-10-27',
+          recurrenceId: 'rec-1',
+        },
+        notificationTime: 10,
+      },
+    ];
 
-      // 1. 매주 반복 일정 생성 (생략)
-      // ...
+    server.use(
+      http.get('/api/events', () => {
+        return HttpResponse.json({ events: mockEvents });
+      }),
+      http.delete('/api/events/:id', ({ params }) => {
+        const { id } = params;
+        const index = mockEvents.findIndex((e) => e.id === id);
 
-      // 2. 두 번째 일정 (1/13) 삭제 버튼 클릭
-      const eventItems = screen.getAllByRole('listitem', { name: /주간 회의/ });
-      const deleteButton = within(eventItems[1]).getByRole('button', { name: /삭제/ });
-      await user.click(deleteButton);
+        if (index !== -1) {
+          mockEvents.splice(index, 1);
+        }
 
-      // 3. 모달에서 "예" 클릭 (단일 삭제)
-      const modal = screen.getByRole('dialog');
-      const yesButton = within(modal).getByRole('button', { name: '예' });
-      await user.click(yesButton);
+        return new HttpResponse(null, { status: 204 });
+      })
+    );
 
-      // 4. 해당 일정만 삭제되고, 다른 일정은 유지되는지 확인
-      const remainingEvents = screen.getAllByRole('listitem', { name: /주간 회의/ });
-      expect(remainingEvents).toHaveLength(3);
-    });
+    const { user } = setup(<App />);
 
-    it.skip('사용자가 반복 일정 전체를 삭제할 수 있다', async () => {
-      const user = userEvent.setup();
-      render(
-        <SnackbarProvider>
-          <App />
-        </SnackbarProvider>
-      );
+    // When: 두 번째 일정 삭제
+    const deleteButtons = await screen.findAllByLabelText('Delete event');
+    await user.click(deleteButtons[1]);
 
-      // 1. 매주 반복 일정 생성 (생략)
-      // ...
+    // 모달에서 "예" (단일 삭제) 클릭
+    const modal = await screen.findByRole('dialog');
+    expect(within(modal).getByText('반복 일정 삭제')).toBeInTheDocument();
+    expect(within(modal).getByText('해당 일정만 삭제하시겠어요?')).toBeInTheDocument();
 
-      // 2. 임의의 일정 삭제 버튼 클릭
-      const eventItems = screen.getAllByRole('listitem', { name: /주간 회의/ });
-      const deleteButton = within(eventItems[0]).getByRole('button', { name: /삭제/ });
-      await user.click(deleteButton);
+    await user.click(screen.getByRole('button', { name: '예' }));
 
-      // 3. 모달에서 "아니오" 클릭 (전체 삭제)
-      const modal = screen.getByRole('dialog');
-      const noButton = within(modal).getByRole('button', { name: '아니오' });
-      await user.click(noButton);
+    // Then: 검증
+    const eventList = within(screen.getByTestId('event-list'));
+    const weeklyMeetings = eventList.getAllByText('주간 회의');
+    expect(weeklyMeetings).toHaveLength(3);
 
-      // 4. 모든 일정이 삭제되었는지 확인
-      expect(screen.queryByText('주간 회의')).not.toBeInTheDocument();
-    });
+    const repeatIcons = eventList.getAllByLabelText('반복 일정');
+    expect(repeatIcons).toHaveLength(3);
+  });
+
+  it('반복 일정 전체를 삭제하면 모든 일정이 삭제된다', async () => {
+    // Given: 4개의 반복 일정 설정
+    const mockEvents: Event[] = [
+      {
+        id: '1',
+        title: '주간 회의',
+        date: '2025-10-06',
+        startTime: '10:00',
+        endTime: '11:00',
+        description: '주간 팀 미팅',
+        location: '회의실 A',
+        category: '업무',
+        repeat: {
+          type: 'weekly',
+          interval: 1,
+          endDate: '2025-10-27',
+          recurrenceId: 'rec-1',
+        },
+        notificationTime: 10,
+      },
+      {
+        id: '2',
+        title: '주간 회의',
+        date: '2025-10-13',
+        startTime: '10:00',
+        endTime: '11:00',
+        description: '주간 팀 미팅',
+        location: '회의실 A',
+        category: '업무',
+        repeat: {
+          type: 'weekly',
+          interval: 1,
+          endDate: '2025-10-27',
+          recurrenceId: 'rec-1',
+        },
+        notificationTime: 10,
+      },
+      {
+        id: '3',
+        title: '주간 회의',
+        date: '2025-10-20',
+        startTime: '10:00',
+        endTime: '11:00',
+        description: '주간 팀 미팅',
+        location: '회의실 A',
+        category: '업무',
+        repeat: {
+          type: 'weekly',
+          interval: 1,
+          endDate: '2025-10-27',
+          recurrenceId: 'rec-1',
+        },
+        notificationTime: 10,
+      },
+      {
+        id: '4',
+        title: '주간 회의',
+        date: '2025-10-27',
+        startTime: '10:00',
+        endTime: '11:00',
+        description: '주간 팀 미팅',
+        location: '회의실 A',
+        category: '업무',
+        repeat: {
+          type: 'weekly',
+          interval: 1,
+          endDate: '2025-10-27',
+          recurrenceId: 'rec-1',
+        },
+        notificationTime: 10,
+      },
+    ];
+
+    server.use(
+      http.get('/api/events', () => {
+        return HttpResponse.json({ events: mockEvents });
+      }),
+      http.delete('/api/events/:id', ({ params }) => {
+        const { id } = params;
+        const targetEvent = mockEvents.find((e) => e.id === id);
+
+        if (targetEvent?.repeat.recurrenceId) {
+          // 전체 삭제: 동일한 recurrenceId를 가진 모든 일정 삭제
+          const recurrenceId = targetEvent.repeat.recurrenceId;
+          const indicesToRemove = mockEvents
+            .map((e, index) => (e.repeat.recurrenceId === recurrenceId ? index : -1))
+            .filter((index) => index !== -1)
+            .reverse();
+
+          indicesToRemove.forEach((index) => mockEvents.splice(index, 1));
+        }
+
+        return new HttpResponse(null, { status: 204 });
+      })
+    );
+
+    const { user } = setup(<App />);
+
+    // When: 첫 번째 일정 삭제
+    const deleteButtons = await screen.findAllByLabelText('Delete event');
+    await user.click(deleteButtons[0]);
+
+    // 모달에서 "아니오" (전체 삭제) 클릭
+    const modal = await screen.findByRole('dialog');
+    expect(within(modal).getByText('반복 일정 삭제')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: '아니오' }));
+
+    // Then: 검증
+    const eventList = within(screen.getByTestId('event-list'));
+    expect(eventList.getByText('검색 결과가 없습니다.')).toBeInTheDocument();
+    expect(eventList.queryByText('주간 회의')).not.toBeInTheDocument();
   });
 });
