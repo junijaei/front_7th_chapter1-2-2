@@ -4,12 +4,7 @@ import type { Event, RepeatType } from '../../types';
 
 describe('recurringEventUtils', () => {
   beforeEach(() => {
-    vi.useFakeTimers();
     vi.setSystemTime(new Date('2025-01-01'));
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
   });
 
   describe('generateRecurringEvents', () => {

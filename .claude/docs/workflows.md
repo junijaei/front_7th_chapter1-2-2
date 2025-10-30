@@ -184,7 +184,7 @@ Orchestrator 조율    │                             │
 - **Handoff 필수**: 모든 프롬프트에는 다음 실행 대상 에이전트를 명시한다.
 - **Context 보존**: 외부 문서 참조 없이 필요한 정보를 포함한다.
 - **제약 명시**: 에이전트의 한계나 권한을 명확히 기술한다.
-- **Git 커밋 관리**: PM은 각 에이전트의 산출물을 체크리스트 검증 후 즉시 커밋한다.
+- **Git 커밋 관리**: 오케스트레이터는 각 에이전트의 산출물을 체크리스트 검증 후 즉시 커밋한다.
 - **품질 검증**: 모든 산출물은 해당 에이전트의 체크리스트를 통과해야 한다.
 
 ---
@@ -222,12 +222,12 @@ Orchestrator 조율    │                             │
 - 테스트 시나리오를 Vitest/React Testing Library 코드로 변환
 - 실패하는 테스트 작성 및 실행 확인
 - 테스트 커버리지 70% 이상 목표
-- **산출물**: `tests/unit/`, `tests/integration/`
+- **산출물**: (실제 테스트 코드 경로에 구현)
 
 **Implementer**:
 - 테스트를 통과시키는 최소한의 코드 구현
 - PRD의 요구사항 준수
-- **산출물**: `implementation/` (실제 소스 코드 경로에 구현)
+- **산출물**: (실제 소스 코드 경로에 구현)
 
 **Refactorer**:
 - QA 통과 후 코드 품질 개선 및 리팩토링
@@ -256,11 +256,6 @@ Orchestrator 조율    │                             │
 └── {project-id}-{YYYYMMDD}/        # 예: PROJ-001-20250129
     ├── prd.md                       # PM 산출물 (티켓: PROJ-001)
     ├── test-scenarios.md            # Test Designer 산출물 (티켓: PROJ-002)
-    ├── tests/                       # Test Writer 산출물 (티켓: PROJ-003)
-    │   ├── unit/                    # 단위 테스트 코드
-    │   └── integration/             # 통합 테스트 코드
-    ├── implementation/              # Implementer 산출물 (티켓: PROJ-004)
-    │   └── code files               # 구현 코드
     ├── qa-report.md                 # QA 산출물 (티켓: PROJ-005)
     ├── refactoring-report.md        # Refactorer 산출물 (티켓: PROJ-006)
     ├── index.md                     # Doc Keeper 산출물 (티켓: PROJ-007)
@@ -270,51 +265,6 @@ Orchestrator 조율    │                             │
 **프로젝트 ID 형식**: `{PREFIX}-{NUMBER}-{YYYYMMDD}`
 - 예시: `PROJ-001-20250129`
 - 한 번에 하나의 프로젝트만 활성화
-
-### 6.2 Git 커밋 규칙
-
-#### 6.2.1 기본 커밋 규칙
-- **커밋 시점**: 에이전트 산출물 검증 통과 직후
-- **커밋 단위**: 하나의 에이전트 = 하나의 커밋
-- **커밋 형식**: `<type>(<ticket-number>): [Agent명] <subject>`
-- **상세 규칙**: `.claude/docs/git-commit-convention.md` 참조
-
-#### 6.2.2 중간 커밋 기준
-
-각 에이전트는 자신이 담당한 역할의 업무를 완료할 때마다 커밋한다.
-에이전트의 전체 작업이 끝나기 전이라도, 다음 중 하나에 해당하면 **중간 커밋**을 수행한다:
-
-**1. 기능 단위로 의미 있는 변경이 발생했을 때**
-- 예: 컴포넌트 UI 마크업 완료, API 통신 로직 연결 완료
-- 기준: **"하나의 기능 단위로 실행 가능한 상태"**일 경우 커밋
-- 예시 커밋 메시지:
-  - `feat(PROJ-004): [Implementer] Add recurring event utility functions`
-  - `feat(PROJ-004): [Implementer] Implement RecurrenceSelector component`
-
-**2. 변경 범위가 커져 복구가 어려울 수 있을 때**
-- 예: 리팩토링으로 파일 구조나 인터페이스가 대폭 수정되는 경우
-- 기준: 변경 규모가 커지기 전에 커밋 후 다음 단계 진행
-- 예시 커밋 메시지:
-  - `refactor(PROJ-006): [Refactorer] Restructure event data model`
-
-**3. 외부 에이전트 또는 협업자가 병렬로 작업 중일 때**
-- 예: Architect가 작성한 구조를 Developer가 즉시 참고해야 하는 상황
-- 기준: **"다른 사람이 참고 가능한 시점"**마다 커밋
-- 예시 커밋 메시지:
-  - `docs(PROJ-001): [PM] Add PRD for recurring events feature`
-  - `test(PROJ-002): [Test Designer] Add test scenarios`
-
-**중간 커밋 예시**:
-```
-# Implementer 에이전트가 여러 컴포넌트를 구현하는 경우
-feat(PROJ-004): [Implementer] Add recurring event utility functions
-feat(PROJ-004): [Implementer] Implement RecurrenceSelector component
-feat(PROJ-004): [Implementer] Implement RecurrenceEditModal component
-feat(PROJ-004): [Implementer] Integrate recurring events into event system
-feat(PROJ-004): [Implementer] Complete recurring events implementation
-
-# 마지막 커밋이 에이전트의 최종 산출물임을 나타냄
-```
 
 ---
 

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi } from 'vitest';
-import { render, screen, within } from '@testing-library/userEvent';
+import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { RecurrenceSelector } from '../../components/RecurrenceSelector';
 import type { RepeatInfo } from '../../types';

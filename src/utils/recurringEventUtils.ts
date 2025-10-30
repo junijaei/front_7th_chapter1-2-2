@@ -46,11 +46,16 @@ export function generateRecurringEvents(
       if (startMonth === 1 && startDay === 29) {
         // 2월 29일
         if (!isLeapYear(currentDate)) {
-          // 다음 해로 이동
+          // 다음 해로 이동 (switch문에서 다시 addYears하므로 여기서는 안함)
           currentDate = addYears(currentDate, 1);
+          currentDate.setMonth(startMonth);
+          currentDate.setDate(1);
           continue;
         }
       }
+      // 매년 반복의 경우 월/일을 시작일과 동일하게 설정
+      currentDate.setMonth(startMonth);
+      currentDate.setDate(startDay);
     }
 
     // 현재 날짜가 종료 날짜를 초과하면 중단
