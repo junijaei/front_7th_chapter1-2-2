@@ -1,7 +1,7 @@
 # Frontend Agent Workflow
 
-본 문서는 프론트엔드 프로젝트를 위한 에이전트 간 워크플로우를 정의한다.  
-모든 에이전트는 **Product Manager (PM)**의 관리 하에 동작하며, PM은 각 단계의 실행 시점과 입력 데이터를 제어한다.  
+본 문서는 프론트엔드 프로젝트를 위한 에이전트 간 워크플로우를 정의한다.
+모든 에이전트는 **Orchestrator**의 조율 하에 동작하며, Orchestrator는 TDD 사이클이 성공적으로 완료될 때까지 각 에이전트를 적절하게 호출하고 관리한다.
 워크플로우는 선형이 아닌 병렬적으로 동작할 수 있으며, 모든 산출물은 명시적으로 연결된다.
 
 ---
@@ -10,6 +10,7 @@
 
 | 순서 | 에이전트 | 주요 역할 | 입력 | 산출물 |
 | ---- | -------- | -------- | ---- | ------ |
+| 0 | **Orchestrator** | TDD 워크플로우 자동 조율 및 실행 | 사용자 요구사항 | 완성된 기능 (모든 테스트 통과) |
 | 1 | **Product Manager (PM)** | 프로젝트 전반 관리 및 PRD 작성 | PRD 초안 | 최종 PRD |
 | 2 | **Test Designer** | 테스트 시나리오 설계 | PRD | 테스트 시나리오 문서 |
 | 3 | **Test Writer** | 테스트 코드 작성 | 테스트 시나리오 | 실패하는 테스트 코드 |
@@ -22,11 +23,23 @@
 
 ## 2. Workflow Overview
 
-1. **PM**
+### 0. **Orchestrator (TDD 워크플로우 조율자)**
+   - **역할**: 요구사항을 받아 TDD 사이클이 완전히 완료될 때까지 모든 에이전트를 자동으로 조율
+   - **책임**:
+     - 사용자 요구사항 분석 및 프로젝트 초기화
+     - PM → Test Designer → Test Writer → Implementer → QA → Refactorer 순차 실행
+     - 각 단계의 산출물 검증 및 다음 단계 실행 여부 판단
+     - 테스트 실패 시 적절한 단계로 회귀 (TDD Red-Green-Refactor 보장)
+     - 모든 테스트 통과 확인 및 최종 완료 판정
+   - **종료 조건**: 모든 테스트가 통과하고 QA 검증이 완료될 때까지 반복
+   - **산출물**: 완성된 기능 (테스트 + 구현 코드 + 문서)
+
+### 1. **PM**
    - 프로젝트 시작점으로 PRD를 작성하고 요구사항을 정의.
    - 모든 기능 요구사항과 제약사항을 명확히 문서화.
+   - Orchestrator의 요청에 따라 실행.
 
-2. **TDD 사이클 (Test Designer → Test Writer → Implementer)**
+### 2. **TDD 사이클 (Test Designer → Test Writer → Implementer)**
    - **Test Designer**: PRD 기반 테스트 시나리오 설계
      - Given-When-Then 형식 테스트 케이스 작성
      - 단위/통합 테스트 범위 정의
@@ -60,42 +73,107 @@
 
 ## 3. Data Flow Summary
 
+### 3.1 Orchestrator 중심 흐름
+
 ```
-PM (PRD)
-  ↓ [승인]
-Test Designer [테스트 시나리오 검증 게이트]
-  ↓ [OK] 또는 ↑ [피드백]
-Test Writer [테스트 작성 검증]
-  ↓ [RED 확인]
-Implementer [GREEN 달성]
-  ↓ [성공]
-QA [통합 검증]
-  ├─ [PASS] → Refactorer
-  ├─ [FAIL - 구현 문제] → Implementer로 돌아감
-  └─ [FAIL - 테스트 부족] → Test Designer/Writer로 돌아감
-  ↓
-Refactorer [코드 품질]
-  ├─ [테스트 깨짐] → Test Writer로 돌아감
-  └─ [OK] → QA 재검증
-  ↓
-Doc Keeper
+[사용자 요구사항]
+        ↓
+┌──────────────────────────────────────────────────────┐
+│                    Orchestrator                      │
+│  (TDD 사이클 완료까지 모든 에이전트 조율 및 반복)     │
+└──────────────────────────────────────────────────────┘
+        ↓
+    ┌───┴───┐
+    │   PM  │ [PRD 작성]
+    └───┬───┘
+        ↓
+    ┌───────────┐
+    │Test Designer│ [테스트 시나리오 설계]
+    └─────┬─────┘
+          ↓
+    ┌───────────┐
+    │Test Writer│ [실패하는 테스트 작성 - RED]
+    └─────┬─────┘
+          ↓
+    ┌────────────┐
+    │Implementer │ [테스트 통과 코드 작성 - GREEN]
+    └─────┬──────┘
+          ↓
+      ┌───┴───┐
+      │   QA  │ [통합 검증]
+      └───┬───┘
+          ↓
+    ┌─────┴─────┐
+    │           │
+    PASS       FAIL
+    │           │
+    ↓           └──→ [회귀: 적절한 단계로]
+┌──────────┐
+│Refactorer│ [코드 품질 개선 - REFACTOR]
+└────┬─────┘
+     ↓
+ [QA 재검증]
+     ↓
+  [완료]
 ```
 
-**TDD 사이클**:
+### 3.2 상세 흐름 (Orchestrator 관점)
+
+```
+Orchestrator 시작
+  ↓
+1. PM 실행 → PRD 생성
+  ↓ [PRD 검증]
+2. Test Designer 실행 → 테스트 시나리오 생성
+  ↓ [시나리오 검증]
+3. Test Writer 실행 → 실패하는 테스트 생성 (RED)
+  ↓ [테스트 실행: 실패 확인]
+4. Implementer 실행 → 코드 구현 (GREEN)
+  ↓ [테스트 실행: 통과 확인]
+5. QA 실행 → 통합 검증
+  ├─ [PASS] → 6단계로
+  ├─ [FAIL - 구현 문제] → 4단계(Implementer)로 회귀
+  ├─ [FAIL - 테스트 문제] → 3단계(Test Writer)로 회귀
+  └─ [FAIL - 시나리오 문제] → 2단계(Test Designer)로 회귀
+  ↓
+6. Refactorer 실행 → 코드 품질 개선 (REFACTOR)
+  ↓ [테스트 실행: 통과 확인]
+  ├─ [테스트 깨짐] → 4단계(Implementer)로 회귀
+  └─ [테스트 통과] → 7단계로
+  ↓
+7. QA 재검증 → 최종 검증
+  ├─ [PASS] → 8단계로
+  └─ [FAIL] → 적절한 단계로 회귀
+  ↓
+8. Doc Keeper 실행 → 문서화
+  ↓
+Orchestrator 종료 (성공)
+```
+
+### 3.3 TDD 사이클 다이어그램
+
 ```
                     ┌─────────────────────────────┐
-                    ↓                             │
+                    │                             │
+Orchestrator 조율    │                             │
+    ↓               ↓                             │
  PM → Test Designer ⇄ Test Writer ⇄ Implementer   │
                     ↓              ↓              │
                    QA ←─────────── Refactorer  ←──┘
                     ↓
                 Doc Keeper
+                    ↓
+              [Orchestrator 완료]
+
 기호:
 → (단방향): 정보 전달 확정
-⇄ (양방향): 피드백 루프 (실패 시 돌아감)
+⇄ (양방향): 피드백 루프 (실패 시 회귀)
 ```
 
-각 에이전트의 산출물은 명시적 형태(문서 또는 코드)로 다음 단계의 입력이 되어야 한다.
+**핵심 원칙**:
+- Orchestrator는 모든 테스트가 통과할 때까지 TDD 사이클을 반복
+- 각 단계의 산출물은 명시적 형태(문서 또는 코드)로 다음 단계의 입력이 됨
+- 실패 시 적절한 단계로 자동 회귀하여 문제 해결
 
 ---
 
@@ -185,7 +263,8 @@ Doc Keeper
     │   └── code files               # 구현 코드
     ├── qa-report.md                 # QA 산출물 (티켓: PROJ-005)
     ├── refactoring-report.md        # Refactorer 산출물 (티켓: PROJ-006)
-    └── doc-index.md                 # Doc Keeper 산출물 (티켓: PROJ-007)
+    ├── index.md                     # Doc Keeper 산출물 (티켓: PROJ-007)
+    └── final-report.md              # Doc Keeper 산출물 (티켓: PROJ-007)
 ```
 
 **프로젝트 ID 형식**: `{PREFIX}-{NUMBER}-{YYYYMMDD}`
@@ -242,13 +321,14 @@ feat(PROJ-004): [Implementer] Complete recurring events implementation
 ## 7. 참조 문서
 
 ### 7.1 에이전트 정의
+- **Orchestrator Agent**: `.claude/agents/orchestrator.md`
 - **PM Agent**: `.claude/agents/pm.md`
 - **Test Designer Agent**: `.claude/agents/test-designer.md`
 - **Test Writer Agent**: `.claude/agents/test-writer.md`
 - **Implementer Agent**: `.claude/agents/implementer.md`
 - **QA Agent**: `.claude/agents/qa.md`
 - **Refactorer Agent**: `.claude/agents/refactorer.md`
-- (추가 에이전트는 생성 시 업데이트)
+- **Doc Keeper Agent**: `.claude/agents/doc-keeper.md`
 
 ### 7.2 지원 문서
 - **에이전트 생성 가이드**: `.claude/docs/agent-generate-guide.md`
@@ -262,8 +342,10 @@ feat(PROJ-004): [Implementer] Complete recurring events implementation
 - **QA 출력 템플릿**: `.claude/docs/templates/qa-output.md`
 - **QA 체크리스트**: `.claude/docs/check-lists/qa-checklist.md`
 - **Refactorer 체크리스트**: `.claude/docs/check-lists/refactorer-checklist.md`
+- **Doc Keeper 출력 템플릿**: `.claude/docs/templates/doc-keeper-output.md`
+- **Doc Keeper 체크리스트**: `.claude/docs/check-lists/doc-keeper-checklist.md`
 
 ---
 
-**최종 제어 주체:** Product Manager
-**최종 산출물:** 완성된 프론트엔드 문서 및 구현 코드 세트
+**최종 제어 주체:** Orchestrator
+**최종 산출물:** 완성된 프론트엔드 문서 및 구현 코드 세트 (모든 테스트 통과)
