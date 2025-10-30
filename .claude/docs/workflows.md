@@ -62,26 +62,37 @@
 
 ```
 PM (PRD)
-↓
-Test Designer (테스트 시나리오)
-↓
-Test Writer (Red - 실패하는 테스트)
-↓
-Implementer (Green - 테스트 통과 코드)
-↓
-QA (통합 검증)
-↓
-Refactorer (코드 품질 개선)
-↓
-Doc Keeper (문서화)
+  ↓ [승인]
+Test Designer [테스트 시나리오 검증 게이트]
+  ↓ [OK] 또는 ↑ [피드백]
+Test Writer [테스트 작성 검증]
+  ↓ [RED 확인]
+Implementer [GREEN 달성]
+  ↓ [성공]
+QA [통합 검증]
+  ├─ [PASS] → Refactorer
+  ├─ [FAIL - 구현 문제] → Implementer로 돌아감
+  └─ [FAIL - 테스트 부족] → Test Designer/Writer로 돌아감
+  ↓
+Refactorer [코드 품질]
+  ├─ [테스트 깨짐] → Test Writer로 돌아감
+  └─ [OK] → QA 재검증
+  ↓
+Doc Keeper
 ```
 
 **TDD 사이클**:
 ```
-Test Designer → Test Writer (Red) → Implementer (Green) → QA → Refactorer
-                      ↑                      ↓
-                      └──────────────────────┘
-                   (테스트 실패 시 반복)
+                    ┌─────────────────────────────┐
+                    ↓                             │
+ PM → Test Designer ⇄ Test Writer ⇄ Implementer   │
+                    ↓              ↓              │
+                   QA ←─────────── Refactorer  ←──┘
+                    ↓
+                Doc Keeper
+기호:
+→ (단방향): 정보 전달 확정
+⇄ (양방향): 피드백 루프 (실패 시 돌아감)
 ```
 
 각 에이전트의 산출물은 명시적 형태(문서 또는 코드)로 다음 단계의 입력이 되어야 한다.
@@ -182,10 +193,49 @@ Test Designer → Test Writer (Red) → Implementer (Green) → QA → Refactore
 - 한 번에 하나의 프로젝트만 활성화
 
 ### 6.2 Git 커밋 규칙
+
+#### 6.2.1 기본 커밋 규칙
 - **커밋 시점**: 에이전트 산출물 검증 통과 직후
 - **커밋 단위**: 하나의 에이전트 = 하나의 커밋
 - **커밋 형식**: `<type>(<ticket-number>): [Agent명] <subject>`
 - **상세 규칙**: `.claude/docs/git-commit-convention.md` 참조
+
+#### 6.2.2 중간 커밋 기준
+
+각 에이전트는 자신이 담당한 역할의 업무를 완료할 때마다 커밋한다.
+에이전트의 전체 작업이 끝나기 전이라도, 다음 중 하나에 해당하면 **중간 커밋**을 수행한다:
+
+**1. 기능 단위로 의미 있는 변경이 발생했을 때**
+- 예: 컴포넌트 UI 마크업 완료, API 통신 로직 연결 완료
+- 기준: **"하나의 기능 단위로 실행 가능한 상태"**일 경우 커밋
+- 예시 커밋 메시지:
+  - `feat(PROJ-004): [Implementer] Add recurring event utility functions`
+  - `feat(PROJ-004): [Implementer] Implement RecurrenceSelector component`
+
+**2. 변경 범위가 커져 복구가 어려울 수 있을 때**
+- 예: 리팩토링으로 파일 구조나 인터페이스가 대폭 수정되는 경우
+- 기준: 변경 규모가 커지기 전에 커밋 후 다음 단계 진행
+- 예시 커밋 메시지:
+  - `refactor(PROJ-006): [Refactorer] Restructure event data model`
+
+**3. 외부 에이전트 또는 협업자가 병렬로 작업 중일 때**
+- 예: Architect가 작성한 구조를 Developer가 즉시 참고해야 하는 상황
+- 기준: **"다른 사람이 참고 가능한 시점"**마다 커밋
+- 예시 커밋 메시지:
+  - `docs(PROJ-001): [PM] Add PRD for recurring events feature`
+  - `test(PROJ-002): [Test Designer] Add test scenarios`
+
+**중간 커밋 예시**:
+```
+# Implementer 에이전트가 여러 컴포넌트를 구현하는 경우
+feat(PROJ-004): [Implementer] Add recurring event utility functions
+feat(PROJ-004): [Implementer] Implement RecurrenceSelector component
+feat(PROJ-004): [Implementer] Implement RecurrenceEditModal component
+feat(PROJ-004): [Implementer] Integrate recurring events into event system
+feat(PROJ-004): [Implementer] Complete recurring events implementation
+
+# 마지막 커밋이 에이전트의 최종 산출물임을 나타냄
+```
 
 ---
 
@@ -196,6 +246,7 @@ Test Designer → Test Writer (Red) → Implementer (Green) → QA → Refactore
 - **Test Designer Agent**: `.claude/agents/test-designer.md`
 - **Test Writer Agent**: `.claude/agents/test-writer.md`
 - **Implementer Agent**: `.claude/agents/implementer.md`
+- **QA Agent**: `.claude/agents/qa.md`
 - **Refactorer Agent**: `.claude/agents/refactorer.md`
 - (추가 에이전트는 생성 시 업데이트)
 
@@ -208,6 +259,8 @@ Test Designer → Test Writer (Red) → Implementer (Green) → QA → Refactore
 - **Test Designer 체크리스트**: `.claude/docs/check-lists/test-designer-checklist.md`
 - **Test Writer 체크리스트**: `.claude/docs/check-lists/test-writer-checklist.md`
 - **Implementer 체크리스트**: `.claude/docs/check-lists/implementer-checklist.md`
+- **QA 출력 템플릿**: `.claude/docs/templates/qa-output.md`
+- **QA 체크리스트**: `.claude/docs/check-lists/qa-checklist.md`
 - **Refactorer 체크리스트**: `.claude/docs/check-lists/refactorer-checklist.md`
 
 ---
