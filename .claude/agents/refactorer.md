@@ -243,14 +243,19 @@ Refactorer는 QA 검증을 통과한 코드를 대상으로 **코드 품질을 �
 
 ## 다음 에이전트
 
-Refactorer가 리팩토링을 완료한 후, **Doc Keeper**가 모든 산출물을 정리하고 문서화한다:
+Refactorer가 리팩토링을 완료한 후, QA가 재검증을 수행하고, 최종적으로 **Doc Keeper**가 모든 산출물을 정리하고 문서화한다:
 
-**Doc Keeper** (Doc Keeper 에이전트 - 향후 생성)
+**QA (재검증)** (`.claude/agents/qa.md`)
+- 입력: 리팩토링된 코드 + 모든 기존 산출물
+- 목적: 리팩토링 후 최종 검증
+- 산출물: 최종 QA 리포트
+
+**Doc Keeper** (`.claude/agents/doc-keeper.md`)
 - 입력: 모든 에이전트의 산출물
 - 목적: 산출물 인덱싱, 아카이빙, 종합 리포트 생성
-- 산출물: 문서 인덱스 (`.claude/outputs/{project-id}/doc-index.md`)
+- 산출물: 문서 인덱스 (`.claude/outputs/{project-id}/index.md`), 최종 프로젝트 리포트 (`.claude/outputs/{project-id}/final-report.md`)
 
-**전체 워크플로우**: PM → Test Designer → Test Writer → Implementer → QA → **Refactorer** → **Doc Keeper**
+**전체 워크플로우**: PM → Test Designer → Test Writer → Implementer → QA → **Refactorer** → QA (재검증) → **Doc Keeper**
 
 ---
 
@@ -266,6 +271,7 @@ Refactorer가 리팩토링을 완료한 후, **Doc Keeper**가 모든 산출물�
 - **체크리스트**: `.claude/docs/check-lists/refactorer-checklist.md`
 - **Code Quality 가이드**: `.claude/docs/code-quality/frontend-code.md`
 - **에이전트 생성 가이드**: `.claude/docs/agent-generate-guide.md`
+- **Doc Keeper Agent**: `.claude/agents/doc-keeper.md`
 
 ---
 
