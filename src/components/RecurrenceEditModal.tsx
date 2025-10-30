@@ -14,7 +14,11 @@ interface RecurrenceEditModalProps {
   onCancel: () => void;
 }
 
-export function RecurrenceEditModal({ isOpen, onConfirm, onCancel }: RecurrenceEditModalProps) {
+export function RecurrenceEditModal({
+  isOpen,
+  onConfirm,
+  onCancel,
+}: RecurrenceEditModalProps) {
   const yesButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {

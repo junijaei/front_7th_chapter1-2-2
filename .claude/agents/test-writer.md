@@ -134,15 +134,6 @@ Test Writer는 Test Designer가 작성한 테스트 시나리오를 **실행 가
 
 **산출물**: 실패하는 테스트 코드
 
-**출력 경로**:
-- 단위 테스트: `.claude/outputs/{project-id}/stories/{story-id}/tests/unit/`
-- 통합 테스트: `.claude/outputs/{project-id}/stories/{story-id}/tests/integration/`
-
-**파일 예시**:
-- `tests/unit/RecurrenceSelector.test.tsx`
-- `tests/unit/generateRecurrences.test.ts`
-- `tests/integration/EventForm.integration.test.tsx`
-
 ---
 
 ## 다음 에이전트

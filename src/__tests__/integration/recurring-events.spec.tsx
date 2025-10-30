@@ -118,6 +118,9 @@ describe('반복 일정 통합 테스트', () => {
       expect(screen.queryByLabelText(/반복 일정/, { selector: '[data-event-id="event-2"]' })).not.toBeInTheDocument();
 
       // 7. 다른 일정은 변경되지 않았는지 확인
+      expect(
+        screen.queryByLabelText(/반복 일정/, { selector: '[data-event-id="event-2"]' })
+      ).not.toBeInTheDocument();
       const remainingEvents = screen.getAllByText('주간 회의');
       expect(remainingEvents).toHaveLength(3);
     });

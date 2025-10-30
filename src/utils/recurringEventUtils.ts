@@ -1,4 +1,13 @@
-import { addDays, addWeeks, addMonths, addYears, format, getDaysInMonth, isLeapYear } from 'date-fns';
+import {
+  addDays,
+  addWeeks,
+  addMonths,
+  addYears,
+  format,
+  getDaysInMonth,
+  isLeapYear,
+} from 'date-fns';
+
 import type { Event, RepeatType, EventForm } from '../types';
 
 /**
