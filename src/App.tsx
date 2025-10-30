@@ -38,6 +38,8 @@ import {
 import { useSnackbar } from 'notistack';
 import { useState } from 'react';
 
+import { RecurrenceEditModal } from './components/RecurrenceEditModal';
+import { RecurrenceDeleteModal } from './components/RecurrenceDeleteModal';
 import { useCalendarView } from './hooks/useCalendarView.ts';
 import { useEventForm } from './hooks/useEventForm.ts';
 import { useEventOperations } from './hooks/useEventOperations.ts';
@@ -112,6 +114,11 @@ function App() {
   const [isOverlapDialogOpen, setIsOverlapDialogOpen] = useState(false);
   const [overlappingEvents, setOverlappingEvents] = useState<Event[]>([]);
 
+  const [isRecurrenceEditModalOpen, setIsRecurrenceEditModalOpen] = useState(false);
+  const [isRecurrenceDeleteModalOpen, setIsRecurrenceDeleteModalOpen] = useState(false);
+  const [pendingEventData, setPendingEventData] = useState<Event | EventForm | null>(null);
+  const [pendingDeleteId, setPendingDeleteId] = useState<string | null>(null);
+
   const { enqueueSnackbar } = useSnackbar();
 
   const addOrUpdateEvent = async () => {
@@ -138,9 +145,17 @@ function App() {
         type: isRepeating ? repeatType : 'none',
         interval: repeatInterval,
         endDate: repeatEndDate || undefined,
+        recurrenceId: editingEvent?.repeat.recurrenceId,
       },
       notificationTime,
     };
+
+    // Check if we're editing a recurring event
+    if (editingEvent && editingEvent.repeat.type !== 'none') {
+      setPendingEventData(eventData);
+      setIsRecurrenceEditModalOpen(true);
+      return;
+    }
 
     const overlapping = findOverlappingEvents(eventData, events);
     if (overlapping.length > 0) {
@@ -150,6 +165,47 @@ function App() {
       await saveEvent(eventData);
       resetForm();
     }
+  };
+
+  const handleRecurrenceEditConfirm = async (type: 'single' | 'all') => {
+    setIsRecurrenceEditModalOpen(false);
+    if (pendingEventData) {
+      await saveEvent(pendingEventData, type);
+      setPendingEventData(null);
+      resetForm();
+    }
+  };
+
+  const handleRecurrenceEditCancel = () => {
+    setIsRecurrenceEditModalOpen(false);
+    setPendingEventData(null);
+  };
+
+  const handleDeleteEvent = async (id: string) => {
+    const event = events.find((e) => e.id === id);
+
+    // Check if it's a recurring event
+    if (event && event.repeat.type !== 'none') {
+      setPendingDeleteId(id);
+      setIsRecurrenceDeleteModalOpen(true);
+      return;
+    }
+
+    // Delete single non-recurring event
+    await deleteEvent(id);
+  };
+
+  const handleRecurrenceDeleteConfirm = async (type: 'single' | 'all') => {
+    setIsRecurrenceDeleteModalOpen(false);
+    if (pendingDeleteId) {
+      await deleteEvent(pendingDeleteId, type);
+      setPendingDeleteId(null);
+    }
+  };
+
+  const handleRecurrenceDeleteCancel = () => {
+    setIsRecurrenceDeleteModalOpen(false);
+    setPendingDeleteId(null);
   };
 
   const renderWeekView = () => {
@@ -435,7 +491,7 @@ function App() {
                 <Select
                   id="repeat-type"
                   size="small"
-                  value={repeatType}
+                  value={repeatType === 'none' ? '' : repeatType}
                   onChange={(e) => setRepeatType(e.target.value as RepeatType)}
                   aria-label="반복"
                 >
@@ -587,7 +643,7 @@ function App() {
                     <IconButton aria-label="Edit event" onClick={() => editEvent(event)}>
                       <Edit />
                     </IconButton>
-                    <IconButton aria-label="Delete event" onClick={() => deleteEvent(event.id)}>
+                    <IconButton aria-label="Delete event" onClick={() => handleDeleteEvent(event.id)}>
                       <Delete />
                     </IconButton>
                   </Stack>
@@ -661,6 +717,18 @@ function App() {
           ))}
         </Stack>
       )}
+
+      <RecurrenceEditModal
+        isOpen={isRecurrenceEditModalOpen}
+        onConfirm={handleRecurrenceEditConfirm}
+        onCancel={handleRecurrenceEditCancel}
+      />
+
+      <RecurrenceDeleteModal
+        isOpen={isRecurrenceDeleteModalOpen}
+        onConfirm={handleRecurrenceDeleteConfirm}
+        onCancel={handleRecurrenceDeleteCancel}
+      />
     </Box>
   );
 }
