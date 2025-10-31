@@ -4,6 +4,7 @@ import { http, HttpResponse } from 'msw';
 import App from '../../App';
 import { server } from '../../setupTests';
 import { Event } from '../../types';
+import { createMockRecurringSeries } from '../test-helpers/factories';
 import { fillAndSubmitRecurringEventForm } from '../test-helpers/integration-helpers';
 import { renderWithProviders } from '../test-helpers/setup';
 
@@ -17,12 +18,11 @@ describe('반복 일정 수정 및 삭제', () => {
   });
 
   it('반복 일정 중 하나를 단일 수정하면 해당 일정만 변경되고 반복 아이콘이 제거된다', async () => {
-    // Given: 4개의 반복 일정 설정
-    const mockEvents: Event[] = [
+    // Given: 4개의 주간 반복 일정 설정
+    const mockEvents: Event[] = createMockRecurringSeries(
+      ['2025-10-06', '2025-10-13', '2025-10-20', '2025-10-27'],
       {
-        id: '1',
         title: '주간 회의',
-        date: '2025-10-06',
         startTime: '10:00',
         endTime: '11:00',
         description: '주간 팀 미팅',
@@ -32,62 +32,10 @@ describe('반복 일정 수정 및 삭제', () => {
           type: 'weekly',
           interval: 1,
           endDate: '2025-10-27',
-          recurrenceId: 'rec-1',
         },
-        notificationTime: 10,
       },
-      {
-        id: '2',
-        title: '주간 회의',
-        date: '2025-10-13',
-        startTime: '10:00',
-        endTime: '11:00',
-        description: '주간 팀 미팅',
-        location: '회의실 A',
-        category: '업무',
-        repeat: {
-          type: 'weekly',
-          interval: 1,
-          endDate: '2025-10-27',
-          recurrenceId: 'rec-1',
-        },
-        notificationTime: 10,
-      },
-      {
-        id: '3',
-        title: '주간 회의',
-        date: '2025-10-20',
-        startTime: '10:00',
-        endTime: '11:00',
-        description: '주간 팀 미팅',
-        location: '회의실 A',
-        category: '업무',
-        repeat: {
-          type: 'weekly',
-          interval: 1,
-          endDate: '2025-10-27',
-          recurrenceId: 'rec-1',
-        },
-        notificationTime: 10,
-      },
-      {
-        id: '4',
-        title: '주간 회의',
-        date: '2025-10-27',
-        startTime: '10:00',
-        endTime: '11:00',
-        description: '주간 팀 미팅',
-        location: '회의실 A',
-        category: '업무',
-        repeat: {
-          type: 'weekly',
-          interval: 1,
-          endDate: '2025-10-27',
-          recurrenceId: 'rec-1',
-        },
-        notificationTime: 10,
-      },
-    ];
+      'rec-1'
+    );
 
     server.use(
       http.get('/api/events', () => {
@@ -148,12 +96,11 @@ describe('반복 일정 수정 및 삭제', () => {
   });
 
   it('반복 일정 전체를 수정하면 모든 일정이 변경되고 반복 아이콘이 유지된다', async () => {
-    // Given: 4개의 반복 일정 설정
-    const mockEvents: Event[] = [
+    // Given: 4개의 주간 반복 일정 설정
+    const mockEvents: Event[] = createMockRecurringSeries(
+      ['2025-10-06', '2025-10-13', '2025-10-20', '2025-10-27'],
       {
-        id: '1',
         title: '주간 회의',
-        date: '2025-10-06',
         startTime: '10:00',
         endTime: '11:00',
         description: '주간 팀 미팅',
@@ -163,62 +110,10 @@ describe('반복 일정 수정 및 삭제', () => {
           type: 'weekly',
           interval: 1,
           endDate: '2025-10-27',
-          recurrenceId: 'rec-1',
         },
-        notificationTime: 10,
       },
-      {
-        id: '2',
-        title: '주간 회의',
-        date: '2025-10-13',
-        startTime: '10:00',
-        endTime: '11:00',
-        description: '주간 팀 미팅',
-        location: '회의실 A',
-        category: '업무',
-        repeat: {
-          type: 'weekly',
-          interval: 1,
-          endDate: '2025-10-27',
-          recurrenceId: 'rec-1',
-        },
-        notificationTime: 10,
-      },
-      {
-        id: '3',
-        title: '주간 회의',
-        date: '2025-10-20',
-        startTime: '10:00',
-        endTime: '11:00',
-        description: '주간 팀 미팅',
-        location: '회의실 A',
-        category: '업무',
-        repeat: {
-          type: 'weekly',
-          interval: 1,
-          endDate: '2025-10-27',
-          recurrenceId: 'rec-1',
-        },
-        notificationTime: 10,
-      },
-      {
-        id: '4',
-        title: '주간 회의',
-        date: '2025-10-27',
-        startTime: '10:00',
-        endTime: '11:00',
-        description: '주간 팀 미팅',
-        location: '회의실 A',
-        category: '업무',
-        repeat: {
-          type: 'weekly',
-          interval: 1,
-          endDate: '2025-10-27',
-          recurrenceId: 'rec-1',
-        },
-        notificationTime: 10,
-      },
-    ];
+      'rec-1'
+    );
 
     server.use(
       http.get('/api/events', () => {
@@ -275,12 +170,11 @@ describe('반복 일정 수정 및 삭제', () => {
   });
 
   it('반복 일정 중 하나를 단일 삭제하면 해당 일정만 삭제된다', async () => {
-    // Given: 4개의 반복 일정 설정
-    const mockEvents: Event[] = [
+    // Given: 4개의 주간 반복 일정 설정
+    const mockEvents: Event[] = createMockRecurringSeries(
+      ['2025-10-06', '2025-10-13', '2025-10-20', '2025-10-27'],
       {
-        id: '1',
         title: '주간 회의',
-        date: '2025-10-06',
         startTime: '10:00',
         endTime: '11:00',
         description: '주간 팀 미팅',
@@ -290,62 +184,10 @@ describe('반복 일정 수정 및 삭제', () => {
           type: 'weekly',
           interval: 1,
           endDate: '2025-10-27',
-          recurrenceId: 'rec-1',
         },
-        notificationTime: 10,
       },
-      {
-        id: '2',
-        title: '주간 회의',
-        date: '2025-10-13',
-        startTime: '10:00',
-        endTime: '11:00',
-        description: '주간 팀 미팅',
-        location: '회의실 A',
-        category: '업무',
-        repeat: {
-          type: 'weekly',
-          interval: 1,
-          endDate: '2025-10-27',
-          recurrenceId: 'rec-1',
-        },
-        notificationTime: 10,
-      },
-      {
-        id: '3',
-        title: '주간 회의',
-        date: '2025-10-20',
-        startTime: '10:00',
-        endTime: '11:00',
-        description: '주간 팀 미팅',
-        location: '회의실 A',
-        category: '업무',
-        repeat: {
-          type: 'weekly',
-          interval: 1,
-          endDate: '2025-10-27',
-          recurrenceId: 'rec-1',
-        },
-        notificationTime: 10,
-      },
-      {
-        id: '4',
-        title: '주간 회의',
-        date: '2025-10-27',
-        startTime: '10:00',
-        endTime: '11:00',
-        description: '주간 팀 미팅',
-        location: '회의실 A',
-        category: '업무',
-        repeat: {
-          type: 'weekly',
-          interval: 1,
-          endDate: '2025-10-27',
-          recurrenceId: 'rec-1',
-        },
-        notificationTime: 10,
-      },
-    ];
+      'rec-1'
+    );
 
     server.use(
       http.get('/api/events', () => {
@@ -386,12 +228,11 @@ describe('반복 일정 수정 및 삭제', () => {
   });
 
   it('반복 일정 전체를 삭제하면 모든 일정이 삭제된다', async () => {
-    // Given: 4개의 반복 일정 설정
-    const mockEvents: Event[] = [
+    // Given: 4개의 주간 반복 일정 설정
+    const mockEvents: Event[] = createMockRecurringSeries(
+      ['2025-10-06', '2025-10-13', '2025-10-20', '2025-10-27'],
       {
-        id: '1',
         title: '주간 회의',
-        date: '2025-10-06',
         startTime: '10:00',
         endTime: '11:00',
         description: '주간 팀 미팅',
@@ -401,62 +242,10 @@ describe('반복 일정 수정 및 삭제', () => {
           type: 'weekly',
           interval: 1,
           endDate: '2025-10-27',
-          recurrenceId: 'rec-1',
         },
-        notificationTime: 10,
       },
-      {
-        id: '2',
-        title: '주간 회의',
-        date: '2025-10-13',
-        startTime: '10:00',
-        endTime: '11:00',
-        description: '주간 팀 미팅',
-        location: '회의실 A',
-        category: '업무',
-        repeat: {
-          type: 'weekly',
-          interval: 1,
-          endDate: '2025-10-27',
-          recurrenceId: 'rec-1',
-        },
-        notificationTime: 10,
-      },
-      {
-        id: '3',
-        title: '주간 회의',
-        date: '2025-10-20',
-        startTime: '10:00',
-        endTime: '11:00',
-        description: '주간 팀 미팅',
-        location: '회의실 A',
-        category: '업무',
-        repeat: {
-          type: 'weekly',
-          interval: 1,
-          endDate: '2025-10-27',
-          recurrenceId: 'rec-1',
-        },
-        notificationTime: 10,
-      },
-      {
-        id: '4',
-        title: '주간 회의',
-        date: '2025-10-27',
-        startTime: '10:00',
-        endTime: '11:00',
-        description: '주간 팀 미팅',
-        location: '회의실 A',
-        category: '업무',
-        repeat: {
-          type: 'weekly',
-          interval: 1,
-          endDate: '2025-10-27',
-          recurrenceId: 'rec-1',
-        },
-        notificationTime: 10,
-      },
-    ];
+      'rec-1'
+    );
 
     server.use(
       http.get('/api/events', () => {
