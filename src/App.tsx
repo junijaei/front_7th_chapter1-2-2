@@ -1,35 +1,14 @@
-import CloseIcon from '@mui/icons-material/Close';
-import {
-  Alert,
-  AlertTitle,
-  Box,
-  Button,
-  Checkbox,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  FormControl,
-  FormControlLabel,
-  FormLabel,
-  IconButton,
-  MenuItem,
-  Select,
-  Stack,
-  TextField,
-  Tooltip,
-  Typography,
-} from '@mui/material';
+import { Box, Stack } from '@mui/material';
 import { useSnackbar } from 'notistack';
 import { useState } from 'react';
 
 import { CalendarView } from './components/CalendarView/CalendarView';
+import { OverlapDialog } from './components/Dialogs/OverlapDialog';
 import { EventForm } from './components/EventForm/EventForm';
-import { EventListItem } from './components/EventList/EventListItem';
+import { EventList } from './components/EventList/EventList';
+import { NotificationStack } from './components/Notifications/NotificationStack';
 import { RecurrenceDeleteModal } from './components/RecurrenceDeleteModal';
 import { RecurrenceEditModal } from './components/RecurrenceEditModal';
-import { notificationOptions } from './constants/eventConstants';
 import { useCalendarView } from './hooks/useCalendarView.ts';
 import { useEventForm } from './hooks/useEventForm.ts';
 import { useEventOperations } from './hooks/useEventOperations.ts';
@@ -177,6 +156,26 @@ function App() {
     setPendingDeleteId(null);
   };
 
+  const handleOverlapConfirm = () => {
+    setIsOverlapDialogOpen(false);
+    saveEvent({
+      id: editingEvent ? editingEvent.id : undefined,
+      title,
+      date,
+      startTime,
+      endTime,
+      description,
+      location,
+      category,
+      repeat: {
+        type: isRepeating ? repeatType : 'none',
+        interval: repeatInterval,
+        endDate: repeatEndDate || undefined,
+      },
+      notificationTime,
+    });
+  };
+
   return (
     <Box sx={{ width: '100%', height: '100vh', margin: 'auto', p: 5 }}>
       <Stack direction="row" spacing={6} sx={{ height: '100%' }}>
@@ -219,99 +218,27 @@ function App() {
           onNavigate={navigate}
         />
 
-        <Stack
-          data-testid="event-list"
-          spacing={2}
-          sx={{ width: '30%', height: '100%', overflowY: 'auto' }}
-        >
-          <FormControl fullWidth>
-            <FormLabel htmlFor="search">일정 검색</FormLabel>
-            <TextField
-              id="search"
-              size="small"
-              placeholder="검색어를 입력하세요"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
-          </FormControl>
-
-          {filteredEvents.length === 0 ? (
-            <Typography>검색 결과가 없습니다.</Typography>
-          ) : (
-            filteredEvents.map((event) => (
-              <EventListItem
-                key={event.id}
-                event={event}
-                isNotified={notifiedEvents.includes(event.id)}
-                onEdit={editEvent}
-                onDelete={handleDeleteEvent}
-              />
-            ))
-          )}
-        </Stack>
+        <EventList
+          filteredEvents={filteredEvents}
+          notifiedEvents={notifiedEvents}
+          searchTerm={searchTerm}
+          onSearchChange={setSearchTerm}
+          onEditEvent={editEvent}
+          onDeleteEvent={handleDeleteEvent}
+        />
       </Stack>
 
-      <Dialog open={isOverlapDialogOpen} onClose={() => setIsOverlapDialogOpen(false)}>
-        <DialogTitle>일정 겹침 경고</DialogTitle>
-        <DialogContent>
-          <DialogContentText>다음 일정과 겹칩니다:</DialogContentText>
-          {overlappingEvents.map((event) => (
-            <Typography key={event.id}>
-              {event.title} ({event.date} {event.startTime}-{event.endTime})
-            </Typography>
-          ))}
-          <DialogContentText>계속 진행하시겠습니까?</DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={() => setIsOverlapDialogOpen(false)}>취소</Button>
-          <Button
-            color="error"
-            onClick={() => {
-              setIsOverlapDialogOpen(false);
-              saveEvent({
-                id: editingEvent ? editingEvent.id : undefined,
-                title,
-                date,
-                startTime,
-                endTime,
-                description,
-                location,
-                category,
-                repeat: {
-                  type: isRepeating ? repeatType : 'none',
-                  interval: repeatInterval,
-                  endDate: repeatEndDate || undefined,
-                },
-                notificationTime,
-              });
-            }}
-          >
-            계속 진행
-          </Button>
-        </DialogActions>
-      </Dialog>
+      <OverlapDialog
+        isOpen={isOverlapDialogOpen}
+        overlappingEvents={overlappingEvents}
+        onClose={() => setIsOverlapDialogOpen(false)}
+        onConfirm={handleOverlapConfirm}
+      />
 
-      {notifications.length > 0 && (
-        <Stack position="fixed" top={16} right={16} spacing={2} alignItems="flex-end">
-          {notifications.map((notification, index) => (
-            <Alert
-              key={index}
-              severity="info"
-              sx={{ width: 'auto' }}
-              action={
-                <IconButton
-                  size="small"
-                  onClick={() => setNotifications((prev) => prev.filter((_, i) => i !== index))}
-                >
-                  <CloseIcon />
-                </IconButton>
-              }
-            >
-              <AlertTitle>{notification.message}</AlertTitle>
-            </Alert>
-          ))}
-        </Stack>
-      )}
+      <NotificationStack
+        notifications={notifications}
+        onRemove={(index) => setNotifications((prev) => prev.filter((_, i) => i !== index))}
+      />
 
       <RecurrenceEditModal
         isOpen={isRecurrenceEditModalOpen}
