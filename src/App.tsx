@@ -264,6 +264,7 @@ function App() {
                           >
                             <Stack direction="row" spacing={1} alignItems="center">
                               {isNotified && <Notifications fontSize="small" />}
+                              {event.repeat.type !== 'none' && <Repeat fontSize="small" />}
                               <Typography
                                 variant="caption"
                                 noWrap
@@ -351,6 +352,7 @@ function App() {
                                 >
                                   <Stack direction="row" spacing={1} alignItems="center">
                                     {isNotified && <Notifications fontSize="small" />}
+                                    {event.repeat.type !== 'none' && <Repeat fontSize="small" />}
                                     <Typography
                                       variant="caption"
                                       noWrap

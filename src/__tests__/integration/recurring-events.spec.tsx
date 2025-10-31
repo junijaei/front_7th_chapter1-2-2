@@ -27,6 +27,10 @@ const setup = (element: ReactElement) => {
 };
 
 describe('반복 일정 수정 및 삭제', () => {
+  beforeEach(() => {
+    expect.hasAssertions();
+  });
+
   afterEach(() => {
     server.resetHandlers();
   });
@@ -512,5 +516,143 @@ describe('반복 일정 수정 및 삭제', () => {
     const eventList = within(screen.getByTestId('event-list'));
     expect(eventList.getByText('검색 결과가 없습니다.')).toBeInTheDocument();
     expect(eventList.queryByText('주간 회의')).not.toBeInTheDocument();
+  });
+});
+
+describe('반복 일정 겹침 검사', () => {
+  beforeEach(() => {
+    expect.hasAssertions();
+  });
+
+  afterEach(() => {
+    server.resetHandlers();
+  });
+
+  it('반복 일정 생성 시 기존 일정과 겹쳐도 경고가 나타나지 않는다', async () => {
+    // Given: 기존 일정이 있는 상태
+    const mockEvents: Event[] = [
+      {
+        id: '1',
+        title: '기존 회의',
+        date: '2025-10-15',
+        startTime: '10:00',
+        endTime: '12:00',
+        description: '기존 미팅',
+        location: '회의실 A',
+        category: '업무',
+        repeat: {
+          type: 'none',
+          interval: 0,
+        },
+        notificationTime: 10,
+      },
+    ];
+
+    server.use(
+      http.get('/api/events', () => {
+        return HttpResponse.json({ events: mockEvents });
+      }),
+      http.post('/api/events', async ({ request }) => {
+        const newEvent = (await request.json()) as Event;
+        const eventWithId = { ...newEvent, id: `${mockEvents.length + 1}` };
+        mockEvents.push(eventWithId);
+        return HttpResponse.json(eventWithId);
+      })
+    );
+
+    const { user } = setup(<App />);
+
+    // When: 시간이 겹치는 반복 일정 생성
+    await user.click(screen.getAllByText('일정 추가')[0]);
+
+    await user.type(screen.getByLabelText('제목'), '반복 회의');
+    await user.type(screen.getByLabelText('날짜'), '2025-10-15');
+    await user.type(screen.getByLabelText('시작 시간'), '11:00');
+    await user.type(screen.getByLabelText('종료 시간'), '13:00');
+    await user.type(screen.getByLabelText('설명'), '반복 미팅');
+    await user.type(screen.getByLabelText('위치'), '회의실 B');
+    await user.click(screen.getByLabelText('카테고리'));
+    await user.click(within(screen.getByLabelText('카테고리')).getByRole('combobox'));
+    await user.click(screen.getByRole('option', { name: '업무-option' }));
+
+    // 반복 일정 설정
+    await user.click(screen.getByLabelText('반복 일정'));
+    await user.click(screen.getByLabelText('반복 유형'));
+    await user.click(screen.getByRole('option', { name: 'weekly-option' }));
+
+    await user.click(screen.getByTestId('event-submit-button'));
+
+    // Then: 겹침 경고 다이얼로그가 나타나지 않음
+    expect(screen.queryByText(/일정 겹침 경고/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/다음 일정과 겹칩니다/i)).not.toBeInTheDocument();
+
+    // 일정이 정상적으로 생성됨
+    const eventList = within(screen.getByTestId('event-list'));
+    expect(await eventList.findByText('반복 회의')).toBeInTheDocument();
+  });
+
+  it('일반 일정 생성 시 기존 일정과 겹치면 경고가 나타난다', async () => {
+    // Given: 기존 일정이 있는 상태
+    const mockEvents: Event[] = [
+      {
+        id: '1',
+        title: '기존 회의',
+        date: '2025-10-15',
+        startTime: '10:00',
+        endTime: '12:00',
+        description: '기존 미팅',
+        location: '회의실 A',
+        category: '업무',
+        repeat: {
+          type: 'none',
+          interval: 0,
+        },
+        notificationTime: 10,
+      },
+    ];
+
+    server.use(
+      http.get('/api/events', () => {
+        return HttpResponse.json({ events: mockEvents });
+      }),
+      http.post('/api/events', async ({ request }) => {
+        const newEvent = (await request.json()) as Event;
+        const eventWithId = { ...newEvent, id: `${mockEvents.length + 1}` };
+        mockEvents.push(eventWithId);
+        return HttpResponse.json(eventWithId);
+      })
+    );
+
+    const { user } = setup(<App />);
+
+    // When: 시간이 겹치는 일반 일정 생성
+    await user.click(screen.getAllByText('일정 추가')[0]);
+
+    await user.type(screen.getByLabelText('제목'), '새 회의');
+    await user.type(screen.getByLabelText('날짜'), '2025-10-15');
+    await user.type(screen.getByLabelText('시작 시간'), '11:00');
+    await user.type(screen.getByLabelText('종료 시간'), '13:00');
+    await user.type(screen.getByLabelText('설명'), '새 미팅');
+    await user.type(screen.getByLabelText('위치'), '회의실 B');
+    await user.click(screen.getByLabelText('카테고리'));
+    await user.click(within(screen.getByLabelText('카테고리')).getByRole('combobox'));
+    await user.click(screen.getByRole('option', { name: '업무-option' }));
+
+    // 반복 일정 체크박스는 체크하지 않음 (일반 일정)
+
+    await user.click(screen.getByTestId('event-submit-button'));
+
+    // Then: 겹침 경고 다이얼로그가 나타남
+    const dialog = await screen.findByRole('dialog');
+    expect(within(dialog).getByText(/일정 겹침 경고/i)).toBeInTheDocument();
+    expect(within(dialog).getByText(/다음 일정과 겹칩니다/i)).toBeInTheDocument();
+    expect(within(dialog).getByText('기존 회의')).toBeInTheDocument();
+
+    // 계속 진행 버튼 클릭
+    await user.click(screen.getByRole('button', { name: /계속/i }));
+
+    // 일정이 정상적으로 생성됨
+    const eventList = within(screen.getByTestId('event-list'));
+    expect(await eventList.findByText('새 회의')).toBeInTheDocument();
   });
 });
