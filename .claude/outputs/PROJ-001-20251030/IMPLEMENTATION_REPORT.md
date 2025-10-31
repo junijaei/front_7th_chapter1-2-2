@@ -218,8 +218,14 @@ Duration: ~13s
 ### Long-term (Low Priority)
 1. Complex repeat patterns (e.g., "first Monday of month")
 2. Exception handling (skip specific dates)
-3. Recurring event overlap detection
-4. Backend API implementation
+3. Backend API implementation
+
+### Design Decision: Recurring Event Overlap
+**Status**: ✅ Implemented (by design)
+- Recurring events intentionally bypass overlap detection
+- Regular events continue to show overlap warnings
+- This allows flexible scheduling of recurring events
+- Implementation: `src/utils/eventOverlap.ts` - `findOverlappingEvents()` function
 
 ---
 
