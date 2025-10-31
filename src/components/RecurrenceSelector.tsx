@@ -20,10 +20,17 @@ export function RecurrenceSelector({ value, onChange, startDate }: RecurrenceSel
   const handleRepeatTypeChange = (newType: string) => {
     const repeatInfo: RepeatInfo = {
       type: newType as RepeatInfo['type'],
-      interval: 1,
+      interval: value.interval || 1,
     };
 
     onChange(repeatInfo);
+  };
+
+  const handleIntervalChange = (newInterval: number) => {
+    onChange({
+      ...value,
+      interval: newInterval > 0 ? newInterval : 1,
+    });
   };
 
   const handleEndDateChange = (endDate: string) => {
@@ -69,6 +76,22 @@ export function RecurrenceSelector({ value, onChange, startDate }: RecurrenceSel
             transition={{ duration: 0.3 }}
             style={{ overflow: 'hidden' }}
           >
+            <TextField
+              fullWidth
+              type="number"
+              label="반복 간격"
+              value={value.interval || 1}
+              onChange={(e) => handleIntervalChange(parseInt(e.target.value, 10))}
+              InputLabelProps={{
+                shrink: true,
+              }}
+              inputProps={{
+                min: 1,
+                step: 1,
+              }}
+              helperText="반복 주기를 설정합니다. (예: 2 = 격일/격주/격월)"
+              sx={{ mb: 2 }}
+            />
             <TextField
               fullWidth
               type="date"
