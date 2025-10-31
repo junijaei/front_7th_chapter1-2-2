@@ -1,12 +1,10 @@
-import {
-  Notifications,
-  ChevronLeft,
-  ChevronRight,
-  Delete,
-  Edit,
-  Close,
-  Repeat,
-} from '@mui/icons-material';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
+import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import DeleteIcon from '@mui/icons-material/Delete';
+import EditIcon from '@mui/icons-material/Edit';
+import CloseIcon from '@mui/icons-material/Close';
+import RepeatIcon from '@mui/icons-material/Repeat';
 import {
   Alert,
   AlertTitle,
@@ -263,8 +261,8 @@ function App() {
                             }}
                           >
                             <Stack direction="row" spacing={1} alignItems="center">
-                              {isNotified && <Notifications fontSize="small" />}
-                              {event.repeat.type !== 'none' && <Repeat fontSize="small" />}
+                              {isNotified && <NotificationsIcon fontSize="small" />}
+                              {event.repeat.type !== 'none' && <RepeatIcon fontSize="small" />}
                               <Typography
                                 variant="caption"
                                 noWrap
@@ -351,8 +349,10 @@ function App() {
                                   }}
                                 >
                                   <Stack direction="row" spacing={1} alignItems="center">
-                                    {isNotified && <Notifications fontSize="small" />}
-                                    {event.repeat.type !== 'none' && <Repeat fontSize="small" />}
+                                    {isNotified && <NotificationsIcon fontSize="small" />}
+                                    {event.repeat.type !== 'none' && (
+                                      <RepeatIcon fontSize="small" />
+                                    )}
                                     <Typography
                                       variant="caption"
                                       noWrap
@@ -497,10 +497,18 @@ function App() {
                   onChange={(e) => setRepeatType(e.target.value as RepeatType)}
                   aria-label="반복"
                 >
-                  <MenuItem value="daily">매일</MenuItem>
-                  <MenuItem value="weekly">매주</MenuItem>
-                  <MenuItem value="monthly">매월</MenuItem>
-                  <MenuItem value="yearly">매년</MenuItem>
+                  <MenuItem value="daily" aria-label="매일">
+                    매일
+                  </MenuItem>
+                  <MenuItem value="weekly" aria-label="매주">
+                    매주
+                  </MenuItem>
+                  <MenuItem value="monthly" aria-label="매월">
+                    매월
+                  </MenuItem>
+                  <MenuItem value="yearly" aria-label="매년">
+                    매년
+                  </MenuItem>
                 </Select>
               </FormControl>
 
@@ -550,7 +558,7 @@ function App() {
 
           <Stack direction="row" spacing={2} justifyContent="space-between" alignItems="center">
             <IconButton aria-label="Previous" onClick={() => navigate('prev')}>
-              <ChevronLeft />
+              <ChevronLeftIcon />
             </IconButton>
             <Select
               size="small"
@@ -566,7 +574,7 @@ function App() {
               </MenuItem>
             </Select>
             <IconButton aria-label="Next" onClick={() => navigate('next')}>
-              <ChevronRight />
+              <ChevronRightIcon />
             </IconButton>
           </Stack>
 
@@ -603,9 +611,9 @@ function App() {
                 <Stack direction="row" justifyContent="space-between">
                   <Stack>
                     <Stack direction="row" spacing={1} alignItems="center">
-                      {notifiedEvents.includes(event.id) && <Notifications color="error" />}
+                      {notifiedEvents.includes(event.id) && <NotificationsIcon color="error" />}
                       {event.repeat.type !== 'none' && (
-                        <Repeat aria-label="반복 일정" fontSize="small" color="action" />
+                        <RepeatIcon aria-label="반복 일정" fontSize="small" color="action" />
                       )}
                       <Typography
                         fontWeight={notifiedEvents.includes(event.id) ? 'bold' : 'normal'}
@@ -643,10 +651,13 @@ function App() {
                   </Stack>
                   <Stack>
                     <IconButton aria-label="Edit event" onClick={() => editEvent(event)}>
-                      <Edit />
+                      <EditIcon />
                     </IconButton>
-                    <IconButton aria-label="Delete event" onClick={() => handleDeleteEvent(event.id)}>
-                      <Delete />
+                    <IconButton
+                      aria-label="Delete event"
+                      onClick={() => handleDeleteEvent(event.id)}
+                    >
+                      <DeleteIcon />
                     </IconButton>
                   </Stack>
                 </Stack>
@@ -659,15 +670,13 @@ function App() {
       <Dialog open={isOverlapDialogOpen} onClose={() => setIsOverlapDialogOpen(false)}>
         <DialogTitle>일정 겹침 경고</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            다음 일정과 겹칩니다:
-            {overlappingEvents.map((event) => (
-              <Typography key={event.id}>
-                {event.title} ({event.date} {event.startTime}-{event.endTime})
-              </Typography>
-            ))}
-            계속 진행하시겠습니까?
-          </DialogContentText>
+          <DialogContentText>다음 일정과 겹칩니다:</DialogContentText>
+          {overlappingEvents.map((event) => (
+            <Typography key={event.id}>
+              {event.title} ({event.date} {event.startTime}-{event.endTime})
+            </Typography>
+          ))}
+          <DialogContentText>계속 진행하시겠습니까?</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setIsOverlapDialogOpen(false)}>취소</Button>
@@ -710,7 +719,7 @@ function App() {
                   size="small"
                   onClick={() => setNotifications((prev) => prev.filter((_, i) => i !== index))}
                 >
-                  <Close />
+                  <CloseIcon />
                 </IconButton>
               }
             >
