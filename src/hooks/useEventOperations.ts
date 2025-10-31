@@ -29,15 +29,21 @@ export const useEventOperations = (editing: boolean, onSave?: () => void) => {
         const startDate = new Date(eventData.date);
         const endDate = new Date(eventData.repeat.endDate);
 
-        const recurringEvents = generateRecurringEvents(startDate, endDate, eventData.repeat.type, {
-          title: eventData.title,
-          startTime: eventData.startTime,
-          endTime: eventData.endTime,
-          description: eventData.description,
-          location: eventData.location,
-          category: eventData.category,
-          notificationTime: eventData.notificationTime,
-        });
+        const recurringEvents = generateRecurringEvents(
+          startDate,
+          endDate,
+          eventData.repeat.type,
+          {
+            title: eventData.title,
+            startTime: eventData.startTime,
+            endTime: eventData.endTime,
+            description: eventData.description,
+            location: eventData.location,
+            category: eventData.category,
+            notificationTime: eventData.notificationTime,
+          },
+          eventData.repeat.interval
+        );
 
         // Save all recurring event instances
         for (const event of recurringEvents) {
