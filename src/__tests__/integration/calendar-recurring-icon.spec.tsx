@@ -149,7 +149,7 @@ describe('캘린더 뷰 반복 아이콘 표시', () => {
       })
     );
 
-    const { user } = setup(<App />);
+    setup(<App />);
 
     // When: 월간 뷰로 전환 (기본값이 월간 뷰)
     const monthView = await screen.findByTestId('month-view');

@@ -1,4 +1,3 @@
-import { useEffect, useRef } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -7,6 +6,7 @@ import {
   DialogActions,
   Button,
 } from '@mui/material';
+import { useEffect, useRef } from 'react';
 
 interface RecurrenceDeleteModalProps {
   isOpen: boolean;
@@ -14,11 +14,7 @@ interface RecurrenceDeleteModalProps {
   onCancel: () => void;
 }
 
-export function RecurrenceDeleteModal({
-  isOpen,
-  onConfirm,
-  onCancel,
-}: RecurrenceDeleteModalProps) {
+export function RecurrenceDeleteModal({ isOpen, onConfirm, onCancel }: RecurrenceDeleteModalProps) {
   const yesButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {

@@ -1,4 +1,3 @@
-import { useEffect, useRef } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -7,6 +6,7 @@ import {
   DialogActions,
   Button,
 } from '@mui/material';
+import { useEffect, useRef } from 'react';
 
 interface RecurrenceEditModalProps {
   isOpen: boolean;
@@ -14,11 +14,7 @@ interface RecurrenceEditModalProps {
   onCancel: () => void;
 }
 
-export function RecurrenceEditModal({
-  isOpen,
-  onConfirm,
-  onCancel,
-}: RecurrenceEditModalProps) {
+export function RecurrenceEditModal({ isOpen, onConfirm, onCancel }: RecurrenceEditModalProps) {
   const yesButtonRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {

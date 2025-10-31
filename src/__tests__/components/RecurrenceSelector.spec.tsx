@@ -1,8 +1,8 @@
-import { describe, it, expect, vi } from 'vitest';
 import { render, screen, within, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { describe, it, expect, vi } from 'vitest';
+
 import { RecurrenceSelector } from '../../components/RecurrenceSelector';
-import type { RepeatInfo } from '../../types';
 
 describe('RecurrenceSelector', () => {
   const defaultProps = {
@@ -70,7 +70,9 @@ describe('RecurrenceSelector', () => {
     const user = userEvent.setup();
     const onChange = vi.fn();
 
-    const { rerender } = render(<RecurrenceSelector value={defaultProps.value} onChange={onChange} />);
+    const { rerender } = render(
+      <RecurrenceSelector value={defaultProps.value} onChange={onChange} />
+    );
 
     const select = screen.getByRole('combobox', { name: /반복/ });
     await user.click(select);

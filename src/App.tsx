@@ -1,9 +1,9 @@
-import NotificationsIcon from '@mui/icons-material/Notifications';
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
+import CloseIcon from '@mui/icons-material/Close';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import CloseIcon from '@mui/icons-material/Close';
+import NotificationsIcon from '@mui/icons-material/Notifications';
 import RepeatIcon from '@mui/icons-material/Repeat';
 import {
   Alert,
@@ -36,8 +36,8 @@ import {
 import { useSnackbar } from 'notistack';
 import { useState } from 'react';
 
-import { RecurrenceEditModal } from './components/RecurrenceEditModal';
 import { RecurrenceDeleteModal } from './components/RecurrenceDeleteModal';
+import { RecurrenceEditModal } from './components/RecurrenceEditModal';
 import { useCalendarView } from './hooks/useCalendarView.ts';
 import { useEventForm } from './hooks/useEventForm.ts';
 import { useEventOperations } from './hooks/useEventOperations.ts';
@@ -86,7 +86,6 @@ function App() {
     repeatType,
     setRepeatType,
     repeatInterval,
-    setRepeatInterval,
     repeatEndDate,
     setRepeatEndDate,
     notificationTime,

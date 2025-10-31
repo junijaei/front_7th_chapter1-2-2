@@ -57,9 +57,7 @@ export const useEventOperations = (editing: boolean, onSave?: () => void) => {
         const recurrenceId = currentEvent.repeat.recurrenceId;
 
         if (recurrenceId) {
-          const relatedEvents = events.filter(
-            (e) => e.repeat.recurrenceId === recurrenceId
-          );
+          const relatedEvents = events.filter((e) => e.repeat.recurrenceId === recurrenceId);
 
           for (const event of relatedEvents) {
             const updatedEvent = {
@@ -146,9 +144,7 @@ export const useEventOperations = (editing: boolean, onSave?: () => void) => {
 
         if (recurrenceId) {
           // Delete all events with the same recurrenceId
-          const relatedEvents = events.filter(
-            (e) => e.repeat.recurrenceId === recurrenceId
-          );
+          const relatedEvents = events.filter((e) => e.repeat.recurrenceId === recurrenceId);
 
           for (const relatedEvent of relatedEvents) {
             const response = await fetch(`/api/events/${relatedEvent.id}`, {

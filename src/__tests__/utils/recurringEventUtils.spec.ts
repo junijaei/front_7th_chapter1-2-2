@@ -1,6 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { generateRecurringEvents, isRecurringEvent } from '../../utils/recurringEventUtils';
+
 import type { Event, RepeatType } from '../../types';
+import { generateRecurringEvents, isRecurringEvent } from '../../utils/recurringEventUtils';
 
 describe('recurringEventUtils', () => {
   beforeEach(() => {
@@ -131,7 +132,7 @@ describe('recurringEventUtils', () => {
 
     it('종료 날짜가 없으면 빈 배열을 반환한다', () => {
       const startDate = new Date('2025-01-01');
-      const endDate = null as any;
+      const endDate: Date | null = null;
       const repeatType: RepeatType = 'daily';
 
       const events = generateRecurringEvents(startDate, endDate, repeatType, baseEventData);
