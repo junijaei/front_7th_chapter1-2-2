@@ -182,68 +182,72 @@ export function EventForm({
         </Select>
       </FormControl>
 
-      <FormControl>
-        <FormControlLabel
-          control={
-            <Checkbox checked={isRepeating} onChange={(e) => setIsRepeating(e.target.checked)} />
-          }
-          label="반복 일정"
-        />
-      </FormControl>
-
-      {isRepeating && (
+      {!editingEvent && (
         <>
-          <FormControl fullWidth>
-            <FormLabel htmlFor="repeat-type">반복</FormLabel>
-            <Select
-              id="repeat-type"
-              size="small"
-              value={repeatType === 'none' ? '' : repeatType}
-              onChange={(e) => setRepeatType(e.target.value as RepeatType)}
-              aria-label="반복"
-            >
-              <MenuItem value="daily" aria-label="매일">
-                매일
-              </MenuItem>
-              <MenuItem value="weekly" aria-label="매주">
-                매주
-              </MenuItem>
-              <MenuItem value="monthly" aria-label="매월">
-                매월
-              </MenuItem>
-              <MenuItem value="yearly" aria-label="매년">
-                매년
-              </MenuItem>
-            </Select>
-          </FormControl>
-
-          <FormControl fullWidth>
-            <FormLabel htmlFor="repeat-interval">반복 간격</FormLabel>
-            <TextField
-              id="repeat-interval"
-              size="small"
-              type="number"
-              value={repeatInterval}
-              onChange={(e) => setRepeatInterval(parseInt(e.target.value, 10) || 1)}
-              inputProps={{
-                min: 1,
-                step: 1,
-              }}
-              helperText="반복 주기를 설정합니다. (예: 2 = 격일/격주/격월)"
+          <FormControl>
+            <FormControlLabel
+              control={
+                <Checkbox checked={isRepeating} onChange={(e) => setIsRepeating(e.target.checked)} />
+              }
+              label="반복 일정"
             />
           </FormControl>
 
-          <FormControl fullWidth>
-            <FormLabel htmlFor="repeat-end-date">종료 날짜</FormLabel>
-            <TextField
-              id="repeat-end-date"
-              size="small"
-              type="date"
-              value={repeatEndDate}
-              onChange={(e) => setRepeatEndDate(e.target.value)}
-              aria-label="종료 날짜"
-            />
-          </FormControl>
+          {isRepeating && (
+            <>
+              <FormControl fullWidth>
+                <FormLabel htmlFor="repeat-type">반복</FormLabel>
+                <Select
+                  id="repeat-type"
+                  size="small"
+                  value={repeatType === 'none' ? '' : repeatType}
+                  onChange={(e) => setRepeatType(e.target.value as RepeatType)}
+                  aria-label="반복"
+                >
+                  <MenuItem value="daily" aria-label="매일">
+                    매일
+                  </MenuItem>
+                  <MenuItem value="weekly" aria-label="매주">
+                    매주
+                  </MenuItem>
+                  <MenuItem value="monthly" aria-label="매월">
+                    매월
+                  </MenuItem>
+                  <MenuItem value="yearly" aria-label="매년">
+                    매년
+                  </MenuItem>
+                </Select>
+              </FormControl>
+
+              <FormControl fullWidth>
+                <FormLabel htmlFor="repeat-interval">반복 간격</FormLabel>
+                <TextField
+                  id="repeat-interval"
+                  size="small"
+                  type="number"
+                  value={repeatInterval}
+                  onChange={(e) => setRepeatInterval(parseInt(e.target.value, 10) || 1)}
+                  inputProps={{
+                    min: 1,
+                    step: 1,
+                  }}
+                  helperText="반복 주기를 설정합니다. (예: 2 = 격일/격주/격월)"
+                />
+              </FormControl>
+
+              <FormControl fullWidth>
+                <FormLabel htmlFor="repeat-end-date">종료 날짜</FormLabel>
+                <TextField
+                  id="repeat-end-date"
+                  size="small"
+                  type="date"
+                  value={repeatEndDate}
+                  onChange={(e) => setRepeatEndDate(e.target.value)}
+                  aria-label="종료 날짜"
+                />
+              </FormControl>
+            </>
+          )}
         </>
       )}
 
