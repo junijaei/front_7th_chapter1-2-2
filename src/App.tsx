@@ -1,10 +1,6 @@
 import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import CloseIcon from '@mui/icons-material/Close';
-import DeleteIcon from '@mui/icons-material/Delete';
-import EditIcon from '@mui/icons-material/Edit';
-import NotificationsIcon from '@mui/icons-material/Notifications';
-import RepeatIcon from '@mui/icons-material/Repeat';
 import {
   Alert,
   AlertTitle,
@@ -36,6 +32,8 @@ import {
 import { useSnackbar } from 'notistack';
 import { useState } from 'react';
 
+import { CalendarEventCard } from './components/CalendarView/CalendarEventCard';
+import { EventListItem } from './components/EventList/EventListItem';
 import { RecurrenceDeleteModal } from './components/RecurrenceDeleteModal';
 import { RecurrenceEditModal } from './components/RecurrenceEditModal';
 import { categories, notificationOptions, weekDays } from './constants/eventConstants';
@@ -231,37 +229,13 @@ function App() {
                       .filter(
                         (event) => new Date(event.date).toDateString() === date.toDateString()
                       )
-                      .map((event) => {
-                        const isNotified = notifiedEvents.includes(event.id);
-                        return (
-                          <Box
-                            key={event.id}
-                            sx={{
-                              p: 0.5,
-                              my: 0.5,
-                              backgroundColor: isNotified ? '#ffebee' : '#f5f5f5',
-                              borderRadius: 1,
-                              fontWeight: isNotified ? 'bold' : 'normal',
-                              color: isNotified ? '#d32f2f' : 'inherit',
-                              minHeight: '18px',
-                              width: '100%',
-                              overflow: 'hidden',
-                            }}
-                          >
-                            <Stack direction="row" spacing={1} alignItems="center">
-                              {isNotified && <NotificationsIcon fontSize="small" />}
-                              {event.repeat.type !== 'none' && <RepeatIcon fontSize="small" />}
-                              <Typography
-                                variant="caption"
-                                noWrap
-                                sx={{ fontSize: '0.75rem', lineHeight: 1.2 }}
-                              >
-                                {event.title}
-                              </Typography>
-                            </Stack>
-                          </Box>
-                        );
-                      })}
+                      .map((event) => (
+                        <CalendarEventCard
+                          key={event.id}
+                          event={event}
+                          isNotified={notifiedEvents.includes(event.id)}
+                        />
+                      ))}
                   </TableCell>
                 ))}
               </TableRow>
@@ -319,39 +293,13 @@ function App() {
                                 {holiday}
                               </Typography>
                             )}
-                            {getEventsForDay(filteredEvents, day).map((event) => {
-                              const isNotified = notifiedEvents.includes(event.id);
-                              return (
-                                <Box
-                                  key={event.id}
-                                  sx={{
-                                    p: 0.5,
-                                    my: 0.5,
-                                    backgroundColor: isNotified ? '#ffebee' : '#f5f5f5',
-                                    borderRadius: 1,
-                                    fontWeight: isNotified ? 'bold' : 'normal',
-                                    color: isNotified ? '#d32f2f' : 'inherit',
-                                    minHeight: '18px',
-                                    width: '100%',
-                                    overflow: 'hidden',
-                                  }}
-                                >
-                                  <Stack direction="row" spacing={1} alignItems="center">
-                                    {isNotified && <NotificationsIcon fontSize="small" />}
-                                    {event.repeat.type !== 'none' && (
-                                      <RepeatIcon fontSize="small" />
-                                    )}
-                                    <Typography
-                                      variant="caption"
-                                      noWrap
-                                      sx={{ fontSize: '0.75rem', lineHeight: 1.2 }}
-                                    >
-                                      {event.title}
-                                    </Typography>
-                                  </Stack>
-                                </Box>
-                              );
-                            })}
+                            {getEventsForDay(filteredEvents, day).map((event) => (
+                              <CalendarEventCard
+                                key={event.id}
+                                event={event}
+                                isNotified={notifiedEvents.includes(event.id)}
+                              />
+                            ))}
                           </>
                         )}
                       </TableCell>
@@ -590,66 +538,13 @@ function App() {
             <Typography>검색 결과가 없습니다.</Typography>
           ) : (
             filteredEvents.map((event) => (
-              <Box
+              <EventListItem
                 key={event.id}
-                role="listitem"
-                aria-label={event.title}
-                sx={{ border: 1, borderRadius: 2, p: 3, width: '100%' }}
-              >
-                <Stack direction="row" justifyContent="space-between">
-                  <Stack>
-                    <Stack direction="row" spacing={1} alignItems="center">
-                      {notifiedEvents.includes(event.id) && <NotificationsIcon color="error" />}
-                      {event.repeat.type !== 'none' && (
-                        <RepeatIcon aria-label="반복 일정" fontSize="small" color="action" />
-                      )}
-                      <Typography
-                        fontWeight={notifiedEvents.includes(event.id) ? 'bold' : 'normal'}
-                        color={notifiedEvents.includes(event.id) ? 'error' : 'inherit'}
-                      >
-                        {event.title}
-                      </Typography>
-                    </Stack>
-                    <Typography>{event.date}</Typography>
-                    <Typography>
-                      {event.startTime} - {event.endTime}
-                    </Typography>
-                    <Typography>{event.description}</Typography>
-                    <Typography>{event.location}</Typography>
-                    <Typography>카테고리: {event.category}</Typography>
-                    {event.repeat.type !== 'none' && (
-                      <Typography>
-                        반복: {event.repeat.interval}
-                        {event.repeat.type === 'daily' && '일'}
-                        {event.repeat.type === 'weekly' && '주'}
-                        {event.repeat.type === 'monthly' && '월'}
-                        {event.repeat.type === 'yearly' && '년'}
-                        마다
-                        {event.repeat.endDate && ` (종료: ${event.repeat.endDate})`}
-                      </Typography>
-                    )}
-                    <Typography>
-                      알림:{' '}
-                      {
-                        notificationOptions.find(
-                          (option) => option.value === event.notificationTime
-                        )?.label
-                      }
-                    </Typography>
-                  </Stack>
-                  <Stack>
-                    <IconButton aria-label="Edit event" onClick={() => editEvent(event)}>
-                      <EditIcon />
-                    </IconButton>
-                    <IconButton
-                      aria-label="Delete event"
-                      onClick={() => handleDeleteEvent(event.id)}
-                    >
-                      <DeleteIcon />
-                    </IconButton>
-                  </Stack>
-                </Stack>
-              </Box>
+                event={event}
+                isNotified={notifiedEvents.includes(event.id)}
+                onEdit={editEvent}
+                onDelete={handleDeleteEvent}
+              />
             ))
           )}
         </Stack>
