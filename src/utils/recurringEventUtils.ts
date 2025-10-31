@@ -16,13 +16,15 @@ import type { Event, RepeatType, EventForm } from '../types';
  * @param endDate 종료 날짜
  * @param repeatType 반복 유형 ('daily' | 'weekly' | 'monthly' | 'yearly')
  * @param eventData 이벤트 데이터
+ * @param interval 반복 간격 (기본값: 1)
  * @returns 생성된 반복 일정 배열
  */
 export function generateRecurringEvents(
   startDate: Date,
   endDate: Date | null,
   repeatType: RepeatType,
-  eventData: Omit<EventForm, 'date' | 'repeat'>
+  eventData: Omit<EventForm, 'date' | 'repeat'>,
+  interval: number = 1
 ): Event[] {
   // 종료 날짜가 없거나 시작 날짜보다 이전이면 빈 배열 반환
   if (!endDate || endDate < startDate) {
@@ -79,7 +81,7 @@ export function generateRecurringEvents(
       date: format(currentDate, 'yyyy-MM-dd'),
       repeat: {
         type: repeatType,
-        interval: 1,
+        interval: interval,
         endDate: format(endDate, 'yyyy-MM-dd'),
         recurrenceId, // 추가: 반복 그룹 ID
       },
@@ -90,16 +92,16 @@ export function generateRecurringEvents(
     // 다음 반복 날짜로 이동
     switch (repeatType) {
       case 'daily':
-        currentDate = addDays(currentDate, 1);
+        currentDate = addDays(currentDate, interval);
         break;
       case 'weekly':
-        currentDate = addWeeks(currentDate, 1);
+        currentDate = addWeeks(currentDate, interval);
         break;
       case 'monthly':
-        currentDate = addMonths(currentDate, 1);
+        currentDate = addMonths(currentDate, interval);
         break;
       case 'yearly':
-        currentDate = addYears(currentDate, 1);
+        currentDate = addYears(currentDate, interval);
         break;
       default:
         return events;
