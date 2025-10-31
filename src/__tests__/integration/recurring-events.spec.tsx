@@ -1,30 +1,11 @@
-import CssBaseline from '@mui/material/CssBaseline';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { render, screen, within } from '@testing-library/react';
-import { userEvent } from '@testing-library/user-event';
+import { screen, within } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
-import { SnackbarProvider } from 'notistack';
-import { ReactElement } from 'react';
 
 import App from '../../App';
 import { server } from '../../setupTests';
 import { Event } from '../../types';
-
-const theme = createTheme();
-
-const setup = (element: ReactElement) => {
-  const user = userEvent.setup();
-
-  return {
-    ...render(
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <SnackbarProvider>{element}</SnackbarProvider>
-      </ThemeProvider>
-    ),
-    user,
-  };
-};
+import { fillAndSubmitRecurringEventForm } from '../test-helpers/integration-helpers';
+import { renderWithProviders } from '../test-helpers/setup';
 
 describe('반복 일정 수정 및 삭제', () => {
   beforeEach(() => {
@@ -130,7 +111,7 @@ describe('반복 일정 수정 및 삭제', () => {
       })
     );
 
-    const { user } = setup(<App />);
+    const { user } = renderWithProviders(<App />);
 
     // When: 두 번째 일정 편집
     const editButtons = await screen.findAllByLabelText('Edit event');
@@ -262,7 +243,7 @@ describe('반복 일정 수정 및 삭제', () => {
       })
     );
 
-    const { user } = setup(<App />);
+    const { user } = renderWithProviders(<App />);
 
     // When: 두 번째 일정 편집
     const editButtons = await screen.findAllByLabelText('Edit event');
@@ -382,7 +363,7 @@ describe('반복 일정 수정 및 삭제', () => {
       })
     );
 
-    const { user } = setup(<App />);
+    const { user } = renderWithProviders(<App />);
 
     // When: 두 번째 일정 삭제
     const deleteButtons = await screen.findAllByLabelText('Delete event');
@@ -500,7 +481,7 @@ describe('반복 일정 수정 및 삭제', () => {
       })
     );
 
-    const { user } = setup(<App />);
+    const { user } = renderWithProviders(<App />);
 
     // When: 첫 번째 일정 삭제
     const deleteButtons = await screen.findAllByLabelText('Delete event');
@@ -560,7 +541,7 @@ describe('반복 일정 겹침 검사', () => {
       })
     );
 
-    const { user } = setup(<App />);
+    const { user } = renderWithProviders(<App />);
 
     // When: 시간이 겹치는 반복 일정 생성
     await user.type(screen.getByLabelText('제목'), '반복 회의');
@@ -628,7 +609,7 @@ describe('반복 일정 겹침 검사', () => {
       })
     );
 
-    const { user } = setup(<App />);
+    const { user } = renderWithProviders(<App />);
 
     // When: 시간이 겹치는 일반 일정 생성
     await user.click(screen.getAllByText('일정 추가')[0]);

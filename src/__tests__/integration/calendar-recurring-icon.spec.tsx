@@ -1,30 +1,10 @@
-import CssBaseline from '@mui/material/CssBaseline';
-import { ThemeProvider, createTheme } from '@mui/material/styles';
-import { render, screen, within } from '@testing-library/react';
-import { userEvent } from '@testing-library/user-event';
+import { screen, within } from '@testing-library/react';
 import { http, HttpResponse } from 'msw';
-import { SnackbarProvider } from 'notistack';
-import { ReactElement } from 'react';
 
 import App from '../../App';
 import { server } from '../../setupTests';
 import { Event } from '../../types';
-
-const theme = createTheme();
-
-const setup = (element: ReactElement) => {
-  const user = userEvent.setup();
-
-  return {
-    ...render(
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <SnackbarProvider>{element}</SnackbarProvider>
-      </ThemeProvider>
-    ),
-    user,
-  };
-};
+import { renderWithProviders } from '../test-helpers/setup';
 
 describe('캘린더 뷰 반복 아이콘 표시', () => {
   beforeEach(() => {
@@ -77,7 +57,7 @@ describe('캘린더 뷰 반복 아이콘 표시', () => {
       })
     );
 
-    const { user } = setup(<App />);
+    const { user } = renderWithProviders(<App />);
 
     // When: 주간 뷰로 전환
     await user.click(within(screen.getByLabelText('뷰 타입 선택')).getByRole('combobox'));
@@ -149,7 +129,7 @@ describe('캘린더 뷰 반복 아이콘 표시', () => {
       })
     );
 
-    setup(<App />);
+    renderWithProviders(<App />);
 
     // When: 월간 뷰로 전환 (기본값이 월간 뷰)
     const monthView = await screen.findByTestId('month-view');
@@ -202,7 +182,7 @@ describe('캘린더 뷰 반복 아이콘 표시', () => {
       })
     );
 
-    setup(<App />);
+    renderWithProviders(<App />);
 
     // When: 이벤트 리스트 확인
     const eventList = await screen.findByTestId('event-list');
