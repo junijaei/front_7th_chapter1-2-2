@@ -180,7 +180,13 @@ describe('recurringEventUtils', () => {
       const repeatType: RepeatType = 'daily';
       const interval = 2;
 
-      const events = generateRecurringEvents(startDate, endDate, repeatType, baseEventData, interval);
+      const events = generateRecurringEvents(
+        startDate,
+        endDate,
+        repeatType,
+        baseEventData,
+        interval
+      );
 
       expect(events).toHaveLength(5); // 1/1, 1/3, 1/5, 1/7, 1/9
       expect(events[0].date).toBe('2025-01-01');
@@ -201,7 +207,13 @@ describe('recurringEventUtils', () => {
       const repeatType: RepeatType = 'daily';
       const interval = 7;
 
-      const events = generateRecurringEvents(startDate, endDate, repeatType, baseEventData, interval);
+      const events = generateRecurringEvents(
+        startDate,
+        endDate,
+        repeatType,
+        baseEventData,
+        interval
+      );
 
       expect(events).toHaveLength(5); // 1/1, 1/8, 1/15, 1/22, 1/29
       expect(events[0].date).toBe('2025-01-01');
@@ -219,7 +231,13 @@ describe('recurringEventUtils', () => {
       const repeatType: RepeatType = 'weekly';
       const interval = 2;
 
-      const events = generateRecurringEvents(startDate, endDate, repeatType, baseEventData, interval);
+      const events = generateRecurringEvents(
+        startDate,
+        endDate,
+        repeatType,
+        baseEventData,
+        interval
+      );
 
       expect(events).toHaveLength(5); // 1/1, 1/15, 1/29, 2/12, 2/26
       expect(events[0].date).toBe('2025-01-01');
@@ -242,7 +260,13 @@ describe('recurringEventUtils', () => {
       const repeatType: RepeatType = 'weekly';
       const interval = 4;
 
-      const events = generateRecurringEvents(startDate, endDate, repeatType, baseEventData, interval);
+      const events = generateRecurringEvents(
+        startDate,
+        endDate,
+        repeatType,
+        baseEventData,
+        interval
+      );
 
       expect(events).toHaveLength(5); // 약 1개월 간격으로 5개
       expect(events[0].date).toBe('2025-01-01');
@@ -260,7 +284,13 @@ describe('recurringEventUtils', () => {
       const repeatType: RepeatType = 'monthly';
       const interval = 2;
 
-      const events = generateRecurringEvents(startDate, endDate, repeatType, baseEventData, interval);
+      const events = generateRecurringEvents(
+        startDate,
+        endDate,
+        repeatType,
+        baseEventData,
+        interval
+      );
 
       expect(events).toHaveLength(5); // 1/15, 3/15, 5/15, 7/15, 9/15
       expect(events[0].date).toBe('2025-01-15');
@@ -283,7 +313,13 @@ describe('recurringEventUtils', () => {
       const repeatType: RepeatType = 'monthly';
       const interval = 3;
 
-      const events = generateRecurringEvents(startDate, endDate, repeatType, baseEventData, interval);
+      const events = generateRecurringEvents(
+        startDate,
+        endDate,
+        repeatType,
+        baseEventData,
+        interval
+      );
 
       expect(events).toHaveLength(5); // 1/1, 4/1, 7/1, 10/1, 2026/1/1
       expect(events[0].date).toBe('2025-01-01');
@@ -303,7 +339,13 @@ describe('recurringEventUtils', () => {
       const repeatType: RepeatType = 'monthly';
       const interval = 2;
 
-      const events = generateRecurringEvents(startDate, endDate, repeatType, baseEventData, interval);
+      const events = generateRecurringEvents(
+        startDate,
+        endDate,
+        repeatType,
+        baseEventData,
+        interval
+      );
 
       // 1월, 3월, 5월, 7월만 31일 존재
       expect(events).toHaveLength(4);
@@ -323,7 +365,13 @@ describe('recurringEventUtils', () => {
       const repeatType: RepeatType = 'yearly';
       const interval = 2;
 
-      const events = generateRecurringEvents(startDate, endDate, repeatType, baseEventData, interval);
+      const events = generateRecurringEvents(
+        startDate,
+        endDate,
+        repeatType,
+        baseEventData,
+        interval
+      );
 
       expect(events).toHaveLength(5); // 2025, 2027, 2029, 2031, 2033
       expect(events[0].date).toBe('2025-03-15');
@@ -347,7 +395,13 @@ describe('recurringEventUtils', () => {
       const repeatType: RepeatType = 'yearly';
       const interval = 2;
 
-      const events = generateRecurringEvents(startDate, endDate, repeatType, baseEventData, interval);
+      const events = generateRecurringEvents(
+        startDate,
+        endDate,
+        repeatType,
+        baseEventData,
+        interval
+      );
 
       // 2024, 2028, 2032만 윤년 (2026, 2030은 평년)
       expect(events).toHaveLength(3);
