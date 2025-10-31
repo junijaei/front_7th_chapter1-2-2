@@ -5,7 +5,6 @@ import App from '../../App';
 import { server } from '../../setupTests';
 import { Event } from '../../types';
 import { createMockRecurringSeries } from '../test-helpers/factories';
-import { fillAndSubmitRecurringEventForm } from '../test-helpers/integration-helpers';
 import { renderWithProviders } from '../test-helpers/setup';
 
 describe('반복 일정 수정 및 삭제', () => {
