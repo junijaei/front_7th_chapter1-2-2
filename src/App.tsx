@@ -1,5 +1,3 @@
-import ChevronLeftIcon from '@mui/icons-material/ChevronLeft';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import CloseIcon from '@mui/icons-material/Close';
 import {
   Alert,
@@ -19,12 +17,6 @@ import {
   MenuItem,
   Select,
   Stack,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   TextField,
   Tooltip,
   Typography,
@@ -32,25 +24,17 @@ import {
 import { useSnackbar } from 'notistack';
 import { useState } from 'react';
 
-import { CalendarEventCard } from './components/CalendarView/CalendarEventCard';
+import { CalendarView } from './components/CalendarView/CalendarView';
 import { EventListItem } from './components/EventList/EventListItem';
 import { RecurrenceDeleteModal } from './components/RecurrenceDeleteModal';
 import { RecurrenceEditModal } from './components/RecurrenceEditModal';
-import { categories, notificationOptions, weekDays } from './constants/eventConstants';
+import { categories, notificationOptions } from './constants/eventConstants';
 import { useCalendarView } from './hooks/useCalendarView.ts';
 import { useEventForm } from './hooks/useEventForm.ts';
 import { useEventOperations } from './hooks/useEventOperations.ts';
 import { useNotifications } from './hooks/useNotifications.ts';
 import { useSearch } from './hooks/useSearch.ts';
 import { Event, EventForm, RepeatType } from './types';
-import {
-  formatDate,
-  formatMonth,
-  formatWeek,
-  getEventsForDay,
-  getWeekDates,
-  getWeeksAtMonth,
-} from './utils/dateUtils';
 import { findOverlappingEvents } from './utils/eventOverlap';
 import { getTimeErrorMessage } from './utils/timeValidation';
 
@@ -190,128 +174,6 @@ function App() {
   const handleRecurrenceDeleteCancel = () => {
     setIsRecurrenceDeleteModalOpen(false);
     setPendingDeleteId(null);
-  };
-
-  const renderWeekView = () => {
-    const weekDates = getWeekDates(currentDate);
-    return (
-      <Stack data-testid="week-view" spacing={4} sx={{ width: '100%' }}>
-        <Typography variant="h5">{formatWeek(currentDate)}</Typography>
-        <TableContainer>
-          <Table sx={{ tableLayout: 'fixed', width: '100%' }}>
-            <TableHead>
-              <TableRow>
-                {weekDays.map((day) => (
-                  <TableCell key={day} sx={{ width: '14.28%', padding: 1, textAlign: 'center' }}>
-                    {day}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              <TableRow>
-                {weekDates.map((date) => (
-                  <TableCell
-                    key={date.toISOString()}
-                    sx={{
-                      height: '120px',
-                      verticalAlign: 'top',
-                      width: '14.28%',
-                      padding: 1,
-                      border: '1px solid #e0e0e0',
-                      overflow: 'hidden',
-                    }}
-                  >
-                    <Typography variant="body2" fontWeight="bold">
-                      {date.getDate()}
-                    </Typography>
-                    {filteredEvents
-                      .filter(
-                        (event) => new Date(event.date).toDateString() === date.toDateString()
-                      )
-                      .map((event) => (
-                        <CalendarEventCard
-                          key={event.id}
-                          event={event}
-                          isNotified={notifiedEvents.includes(event.id)}
-                        />
-                      ))}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Stack>
-    );
-  };
-
-  const renderMonthView = () => {
-    const weeks = getWeeksAtMonth(currentDate);
-
-    return (
-      <Stack data-testid="month-view" spacing={4} sx={{ width: '100%' }}>
-        <Typography variant="h5">{formatMonth(currentDate)}</Typography>
-        <TableContainer>
-          <Table sx={{ tableLayout: 'fixed', width: '100%' }}>
-            <TableHead>
-              <TableRow>
-                {weekDays.map((day) => (
-                  <TableCell key={day} sx={{ width: '14.28%', padding: 1, textAlign: 'center' }}>
-                    {day}
-                  </TableCell>
-                ))}
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {weeks.map((week, weekIndex) => (
-                <TableRow key={weekIndex}>
-                  {week.map((day, dayIndex) => {
-                    const dateString = day ? formatDate(currentDate, day) : '';
-                    const holiday = holidays[dateString];
-
-                    return (
-                      <TableCell
-                        key={dayIndex}
-                        sx={{
-                          height: '120px',
-                          verticalAlign: 'top',
-                          width: '14.28%',
-                          padding: 1,
-                          border: '1px solid #e0e0e0',
-                          overflow: 'hidden',
-                          position: 'relative',
-                        }}
-                      >
-                        {day && (
-                          <>
-                            <Typography variant="body2" fontWeight="bold">
-                              {day}
-                            </Typography>
-                            {holiday && (
-                              <Typography variant="body2" color="error">
-                                {holiday}
-                              </Typography>
-                            )}
-                            {getEventsForDay(filteredEvents, day).map((event) => (
-                              <CalendarEventCard
-                                key={event.id}
-                                event={event}
-                                isNotified={notifiedEvents.includes(event.id)}
-                              />
-                            ))}
-                          </>
-                        )}
-                      </TableCell>
-                    );
-                  })}
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </Stack>
-    );
   };
 
   return (
@@ -489,34 +351,15 @@ function App() {
           </Button>
         </Stack>
 
-        <Stack flex={1} spacing={5}>
-          <Typography variant="h4">일정 보기</Typography>
-
-          <Stack direction="row" spacing={2} justifyContent="space-between" alignItems="center">
-            <IconButton aria-label="Previous" onClick={() => navigate('prev')}>
-              <ChevronLeftIcon />
-            </IconButton>
-            <Select
-              size="small"
-              aria-label="뷰 타입 선택"
-              value={view}
-              onChange={(e) => setView(e.target.value as 'week' | 'month')}
-            >
-              <MenuItem value="week" aria-label="week-option">
-                Week
-              </MenuItem>
-              <MenuItem value="month" aria-label="month-option">
-                Month
-              </MenuItem>
-            </Select>
-            <IconButton aria-label="Next" onClick={() => navigate('next')}>
-              <ChevronRightIcon />
-            </IconButton>
-          </Stack>
-
-          {view === 'week' && renderWeekView()}
-          {view === 'month' && renderMonthView()}
-        </Stack>
+        <CalendarView
+          view={view}
+          currentDate={currentDate}
+          filteredEvents={filteredEvents}
+          notifiedEvents={notifiedEvents}
+          holidays={holidays}
+          onViewChange={setView}
+          onNavigate={navigate}
+        />
 
         <Stack
           data-testid="event-list"
