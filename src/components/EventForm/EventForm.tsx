@@ -218,6 +218,22 @@ export function EventForm({
           </FormControl>
 
           <FormControl fullWidth>
+            <FormLabel htmlFor="repeat-interval">반복 간격</FormLabel>
+            <TextField
+              id="repeat-interval"
+              size="small"
+              type="number"
+              value={repeatInterval}
+              onChange={(e) => setRepeatInterval(parseInt(e.target.value, 10) || 1)}
+              inputProps={{
+                min: 1,
+                step: 1,
+              }}
+              helperText="반복 주기를 설정합니다. (예: 2 = 격일/격주/격월)"
+            />
+          </FormControl>
+
+          <FormControl fullWidth>
             <FormLabel htmlFor="repeat-end-date">종료 날짜</FormLabel>
             <TextField
               id="repeat-end-date"
