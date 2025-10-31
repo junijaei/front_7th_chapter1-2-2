@@ -16,7 +16,6 @@ import { useNotifications } from './hooks/useNotifications.ts';
 import { useSearch } from './hooks/useSearch.ts';
 import { Event, EventForm as EventFormType } from './types';
 import { findOverlappingEvents } from './utils/eventOverlap';
-import { getTimeErrorMessage } from './utils/timeValidation';
 
 function App() {
   const {
@@ -37,6 +36,7 @@ function App() {
     repeatType,
     setRepeatType,
     repeatInterval,
+    setRepeatInterval,
     repeatEndDate,
     setRepeatEndDate,
     notificationTime,
@@ -196,6 +196,8 @@ function App() {
           setIsRepeating={setIsRepeating}
           repeatType={repeatType}
           setRepeatType={setRepeatType}
+          repeatInterval={repeatInterval}
+          setRepeatInterval={setRepeatInterval}
           repeatEndDate={repeatEndDate}
           setRepeatEndDate={setRepeatEndDate}
           notificationTime={notificationTime}

@@ -9,10 +9,10 @@ import {
   Typography,
 } from '@mui/material';
 
+import { CalendarEventCard } from './CalendarEventCard';
 import { weekDays } from '../../constants/eventConstants';
 import { Event } from '../../types';
 import { formatDate, formatMonth, getEventsForDay, getWeeksAtMonth } from '../../utils/dateUtils';
-import { CalendarEventCard } from './CalendarEventCard';
 
 interface MonthViewProps {
   currentDate: Date;
@@ -24,7 +24,12 @@ interface MonthViewProps {
 /**
  * 월간 캘린더 뷰 컴포넌트
  */
-export function MonthView({ currentDate, filteredEvents, notifiedEvents, holidays }: MonthViewProps) {
+export function MonthView({
+  currentDate,
+  filteredEvents,
+  notifiedEvents,
+  holidays,
+}: MonthViewProps) {
   const weeks = getWeeksAtMonth(currentDate);
 
   return (

@@ -31,7 +31,10 @@ export function EventListItem({ event, isNotified, onEdit, onDelete }: EventList
             {event.repeat.type !== 'none' && (
               <RepeatIcon aria-label="반복 일정" fontSize="small" color="action" />
             )}
-            <Typography fontWeight={isNotified ? 'bold' : 'normal'} color={isNotified ? 'error' : 'inherit'}>
+            <Typography
+              fontWeight={isNotified ? 'bold' : 'normal'}
+              color={isNotified ? 'error' : 'inherit'}
+            >
               {event.title}
             </Typography>
           </Stack>

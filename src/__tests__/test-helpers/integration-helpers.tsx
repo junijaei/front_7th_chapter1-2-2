@@ -104,7 +104,8 @@ export const fillAndSubmitRecurringEventForm = async (
   await user.click(screen.getByRole('option', { name: repeatType }));
 
   // 반복 종료 날짜 입력
-  await user.type(screen.getByLabelText('반복 종료일'), endDate);
+  const repeatEndDateInput = document.querySelector('#repeat-end-date') as HTMLInputElement;
+  await user.type(repeatEndDateInput, endDate);
 
   // 폼 제출
   await user.click(screen.getByTestId('event-submit-button'));

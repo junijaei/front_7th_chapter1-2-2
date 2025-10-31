@@ -8,7 +8,10 @@ import {
 } from '../../__mocks__/handlersUtils';
 import App from '../../App';
 import { server } from '../../setupTests';
-import { fillAndSubmitEventForm } from '../test-helpers/integration-helpers';
+import {
+  fillAndSubmitEventForm,
+  fillAndSubmitRecurringEventForm,
+} from '../test-helpers/integration-helpers';
 import { renderWithProviders } from '../test-helpers/setup';
 
 describe('일정 CRUD 및 기본 기능', () => {
@@ -53,6 +56,32 @@ describe('일정 CRUD 및 기본 기능', () => {
     const eventList = within(screen.getByTestId('event-list'));
     expect(eventList.getByText('수정된 회의')).toBeInTheDocument();
     expect(eventList.getByText('회의 내용 변경')).toBeInTheDocument();
+  });
+
+  it('반복 일정을 생성하면 여러 일정이 생성된다', async () => {
+    setupMockHandlerCreation();
+
+    const { user } = renderWithProviders(<App />);
+
+    await fillAndSubmitRecurringEventForm(
+      user,
+      {
+        title: '주간 회의',
+        date: '2025-10-15',
+        startTime: '14:00',
+        endTime: '15:00',
+        description: '주간 회의',
+        location: '회의실 A',
+        category: '업무',
+      },
+      '매주',
+      '2025-11-15'
+    );
+
+    const eventList = within(screen.getByTestId('event-list'));
+
+    // 5주간의 반복 일정이 생성되어야 함 (10/15, 10/22, 10/29, 11/05, 11/12)
+    expect((await eventList.findAllByText('주간 회의')).length).toBeGreaterThanOrEqual(5);
   });
 
   it('일정을 삭제하고 더 이상 조회되지 않는지 확인한다', async () => {

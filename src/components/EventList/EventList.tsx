@@ -1,7 +1,7 @@
 import { FormControl, FormLabel, Stack, TextField, Typography } from '@mui/material';
 
-import { Event } from '../../types';
 import { EventListItem } from './EventListItem';
+import { Event } from '../../types';
 
 interface EventListProps {
   filteredEvents: Event[];

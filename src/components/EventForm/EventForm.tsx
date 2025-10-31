@@ -11,6 +11,7 @@ import {
   Tooltip,
   Typography,
 } from '@mui/material';
+import { ChangeEvent } from 'react';
 
 import { categories, notificationOptions } from '../../constants/eventConstants';
 import { Event, RepeatType } from '../../types';
@@ -34,6 +35,8 @@ interface EventFormProps {
   setIsRepeating: (value: boolean) => void;
   repeatType: RepeatType;
   setRepeatType: (value: RepeatType) => void;
+  repeatInterval: number;
+  setRepeatInterval: (value: number) => void;
   repeatEndDate: string;
   setRepeatEndDate: (value: string) => void;
   notificationTime: number;
@@ -47,8 +50,8 @@ interface EventFormProps {
   editingEvent: Event | null;
 
   // Handlers
-  handleStartTimeChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
-  handleEndTimeChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  handleStartTimeChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  handleEndTimeChange: (e: ChangeEvent<HTMLInputElement>) => void;
   onSubmit: () => void;
 }
 
@@ -72,6 +75,8 @@ export function EventForm({
   setIsRepeating,
   repeatType,
   setRepeatType,
+  repeatInterval,
+  setRepeatInterval,
   repeatEndDate,
   setRepeatEndDate,
   notificationTime,
@@ -89,12 +94,23 @@ export function EventForm({
 
       <FormControl fullWidth>
         <FormLabel htmlFor="title">제목</FormLabel>
-        <TextField id="title" size="small" value={title} onChange={(e) => setTitle(e.target.value)} />
+        <TextField
+          id="title"
+          size="small"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+        />
       </FormControl>
 
       <FormControl fullWidth>
         <FormLabel htmlFor="date">날짜</FormLabel>
-        <TextField id="date" size="small" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
+        <TextField
+          id="date"
+          size="small"
+          type="date"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+        />
       </FormControl>
 
       <Stack direction="row" spacing={2}>
@@ -140,7 +156,12 @@ export function EventForm({
 
       <FormControl fullWidth>
         <FormLabel htmlFor="location">위치</FormLabel>
-        <TextField id="location" size="small" value={location} onChange={(e) => setLocation(e.target.value)} />
+        <TextField
+          id="location"
+          size="small"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+        />
       </FormControl>
 
       <FormControl fullWidth>
@@ -163,7 +184,9 @@ export function EventForm({
 
       <FormControl>
         <FormControlLabel
-          control={<Checkbox checked={isRepeating} onChange={(e) => setIsRepeating(e.target.checked)} />}
+          control={
+            <Checkbox checked={isRepeating} onChange={(e) => setIsRepeating(e.target.checked)} />
+          }
           label="반복 일정"
         />
       </FormControl>
@@ -225,7 +248,12 @@ export function EventForm({
       </FormControl>
 
       {/* ! 반복은 8주차 과제에 포함됩니다. 구현하고 싶어도 참아주세요~ */}
-      <Button data-testid="event-submit-button" onClick={onSubmit} variant="contained" color="primary">
+      <Button
+        data-testid="event-submit-button"
+        onClick={onSubmit}
+        variant="contained"
+        color="primary"
+      >
         {editingEvent ? '일정 수정' : '일정 추가'}
       </Button>
     </Stack>

@@ -9,10 +9,10 @@ import {
   Typography,
 } from '@mui/material';
 
+import { CalendarEventCard } from './CalendarEventCard';
 import { weekDays } from '../../constants/eventConstants';
 import { Event } from '../../types';
 import { formatWeek, getWeekDates } from '../../utils/dateUtils';
-import { CalendarEventCard } from './CalendarEventCard';
 
 interface WeekViewProps {
   currentDate: Date;
