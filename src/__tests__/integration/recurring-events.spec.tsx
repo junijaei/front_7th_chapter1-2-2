@@ -563,8 +563,6 @@ describe('반복 일정 겹침 검사', () => {
     const { user } = setup(<App />);
 
     // When: 시간이 겹치는 반복 일정 생성
-    await user.click(screen.getAllByText('일정 추가')[0]);
-
     await user.type(screen.getByLabelText('제목'), '반복 회의');
     await user.type(screen.getByLabelText('날짜'), '2025-10-15');
     await user.type(screen.getByLabelText('시작 시간'), '11:00');
@@ -576,9 +574,16 @@ describe('반복 일정 겹침 검사', () => {
     await user.click(screen.getByRole('option', { name: '업무-option' }));
 
     // 반복 일정 설정
-    await user.click(screen.getByLabelText('반복 일정'));
-    await user.click(screen.getByLabelText('반복 유형'));
-    await user.click(screen.getByRole('option', { name: 'weekly-option' }));
+    const checkbox = screen.getByRole('checkbox', { name: '반복 일정' });
+
+    // 체크박스가 체크되지 않은 경우에만 클릭
+    if (!checkbox.hasAttribute('checked') || checkbox.getAttribute('checked') === 'false') {
+      await user.click(checkbox);
+    }
+
+    const repeatSelect = await screen.findByLabelText('반복');
+    await user.click(within(repeatSelect).getByRole('combobox'));
+    await user.click(screen.getByRole('option', { name: '매주' }));
 
     await user.click(screen.getByTestId('event-submit-button'));
 
@@ -646,7 +651,7 @@ describe('반복 일정 겹침 검사', () => {
     const dialog = await screen.findByRole('dialog');
     expect(within(dialog).getByText(/일정 겹침 경고/i)).toBeInTheDocument();
     expect(within(dialog).getByText(/다음 일정과 겹칩니다/i)).toBeInTheDocument();
-    expect(within(dialog).getByText('기존 회의')).toBeInTheDocument();
+    expect(within(dialog).getByText(/기존 회의/)).toBeInTheDocument();
 
     // 계속 진행 버튼 클릭
     await user.click(screen.getByRole('button', { name: /계속/i }));

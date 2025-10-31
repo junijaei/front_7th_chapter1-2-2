@@ -80,7 +80,7 @@ describe('캘린더 뷰 반복 아이콘 표시', () => {
     const { user } = setup(<App />);
 
     // When: 주간 뷰로 전환
-    await user.click(screen.getByLabelText('view'));
+    await user.click(within(screen.getByLabelText('뷰 타입 선택')).getByRole('combobox'));
     await user.click(screen.getByRole('option', { name: 'week-option' }));
 
     // Then: 주간 뷰가 표시됨
